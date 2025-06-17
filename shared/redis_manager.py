@@ -23,7 +23,7 @@ class BotRedisManager:
 
         self.client: redis.Redis | None = None
 
-    async def connect(self):
+    async def connect(self) -> None:
         """Redis接続"""
         self.client = redis.Redis(
             host=self.host,
@@ -34,7 +34,7 @@ class BotRedisManager:
         await self.client.ping()
 
     # 市場データ系メソッド
-    async def set_market_data(self, symbol: str, data: dict, ttl: int | None = None):
+    async def set_market_data(self, symbol: str, data: dict, ttl: int | None = None) -> None:
         """市場データを保存"""
         key = RedisKeys.make_key(RedisKeys.MARKET_DATA, self.bot_name, symbol=symbol)
         await self._set_with_ttl(key, data, ttl)
@@ -47,20 +47,20 @@ class BotRedisManager:
     # 取引系メソッド
     async def set_last_trade(
         self, trade_id: str, trade_data: dict, ttl: int | None = None
-    ):
+    ) -> None:
         """最新取引を保存"""
         key = RedisKeys.make_key(RedisKeys.LAST_TRADE, self.bot_name, trade_id=trade_id)
         await self._set_with_ttl(key, trade_data, ttl)
 
     async def set_position(
         self, symbol: str, position_data: dict, ttl: int | None = None
-    ):
+    ) -> None:
         """ポジション情報を保存"""
         key = RedisKeys.make_key(RedisKeys.POSITION, self.bot_name, symbol=symbol)
         await self._set_with_ttl(key, position_data, ttl)
 
     # リスク管理系メソッド
-    async def set_daily_risk_metrics(self, metrics: dict, ttl: int = 86400):
+    async def set_daily_risk_metrics(self, metrics: dict, ttl: int = 86400) -> None:
         """日次リスク指標を保存（デフォルト24時間）"""
         key = RedisKeys.make_key(RedisKeys.RISK_METRICS_DAILY, self.bot_name)
         await self._set_with_ttl(key, metrics, ttl)
@@ -71,7 +71,7 @@ class BotRedisManager:
         return await self._get_json(key)
 
     # 内部メソッド
-    async def _set_with_ttl(self, key: str, value: Any, ttl: int | None = None):
+    async def _set_with_ttl(self, key: str, value: Any, ttl: int | None = None) -> None:
         """TTL付きでデータ保存"""
         if self.client is None:
             raise RuntimeError("Redis client not connected")
