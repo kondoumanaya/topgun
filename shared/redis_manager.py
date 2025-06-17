@@ -9,7 +9,7 @@ class BotRedisManager:
 
     def __init__(self, bot_name: str, bot_config: dict):
         # 共通接続情報
-        self.host = os.getenv('REDIS_HOST')
+        self.host = os.getenv('REDIS_HOST', 'localhost')
         self.port = int(os.getenv('REDIS_PORT', 6379))
         self.password = os.getenv('REDIS_PASSWORD')
 
@@ -31,7 +31,7 @@ class BotRedisManager:
         await self.client.ping()
 
     # 市場データ系メソッド
-    async def set_market_data(self, symbol: str, data: dict, ttl: int = None):
+    async def set_market_data(self, symbol: str, data: dict, ttl: Optional[int] = None):
         """市場データを保存"""
         key = RedisKeys.make_key(RedisKeys.MARKET_DATA, self.bot_name, symbol=symbol)
         await self._set_with_ttl(key, data, ttl)
@@ -42,12 +42,12 @@ class BotRedisManager:
         return await self._get_json(key)
 
     # 取引系メソッド
-    async def set_last_trade(self, trade_id: str, trade_data: dict, ttl: int = None):
+    async def set_last_trade(self, trade_id: str, trade_data: dict, ttl: Optional[int] = None):
         """最新取引を保存"""
         key = RedisKeys.make_key(RedisKeys.LAST_TRADE, self.bot_name, trade_id=trade_id)
         await self._set_with_ttl(key, trade_data, ttl)
 
-    async def set_position(self, symbol: str, position_data: dict, ttl: int = None):
+    async def set_position(self, symbol: str, position_data: dict, ttl: Optional[int] = None):
         """ポジション情報を保存"""
         key = RedisKeys.make_key(RedisKeys.POSITION, self.bot_name, symbol=symbol)
         await self._set_with_ttl(key, position_data, ttl)
@@ -64,8 +64,10 @@ class BotRedisManager:
         return await self._get_json(key)
 
     # 内部メソッド
-    async def _set_with_ttl(self, key: str, value: Any, ttl: int = None):
+    async def _set_with_ttl(self, key: str, value: Any, ttl: Optional[int] = None):
         """TTL付きでデータ保存"""
+        if self.client is None:
+            raise RuntimeError("Redis client not connected")
         ttl = ttl or self.ttl
         if isinstance(value, (dict, list)):
             value = json.dumps(value)
@@ -73,6 +75,8 @@ class BotRedisManager:
 
     async def _get_json(self, key: str) -> Any:
         """JSONデータを取得"""
+        if self.client is None:
+            raise RuntimeError("Redis client not connected")
         value = await self.client.get(key)
         if value:
             try:
