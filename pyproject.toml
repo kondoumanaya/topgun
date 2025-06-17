@@ -96,15 +96,15 @@ performance = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["shared*", "bots*"]
+include = ["shared*", "bot*"]
 exclude = ["topgun*", "tests*", "docs*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.yml", "*.json", "*.toml"]
 
 [project.scripts]
-sherrinford = "bots.sherrinford.main:main"
-watson = "bots.watson.main:main"
+sherrinford = "bot.sherrinford.main:main"
+watson = "bot.watson.main:main"
 root-bot = "shared.cli:main"
 
 [tool.setuptools.dynamic]
@@ -207,7 +207,7 @@ known_third_party = ["aiohttp", "asyncpg", "redis", "pandas", "numpy"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra -q --strict-markers --strict-config --cov=shared --cov=bots"
+addopts = "-ra -q --strict-markers --strict-config --cov=shared --cov=bot"
 testpaths = ["tests"]
 asyncio_mode = "auto"
 python_files = ["test_*.py", "*_test.py"]
@@ -221,7 +221,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["shared", "bots"]
+source = ["shared", "bot"]
 omit = [
     "tests/*",
     "*/migrations/*",

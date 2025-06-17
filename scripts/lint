@@ -4,12 +4,12 @@ set -e
 echo "🧹 Running code formatting and linting..."
 
 # Format code with black
-uv run --with-editable . --with-requirements requirements/dev.txt black shared/ bot/ --config pyproject.toml
+uv run --python 3.12 --no-project --with-requirements requirements/dev.txt black shared/ bot/ --config pyproject.toml
 
 # Lint with ruff
-uv run --with-editable . --with-requirements requirements/dev.txt ruff check shared/ bot/ --config pyproject.toml
+uv run --python 3.12 --no-project --with-requirements requirements/dev.txt ruff check shared/ bot/ --config pyproject.toml
 
 # Sort imports with isort
-uv run --with-editable . --with-requirements requirements/dev.txt isort shared/ bot/ --settings-path pyproject.toml
+uv run --python 3.12 --no-project --with-requirements requirements/dev.txt isort shared/ bot/ --settings-path pyproject.toml
 
 echo "✅ Linting completed successfully"

@@ -3,6 +3,6 @@ set -e
 
 echo "🔍 Running type checking with mypy..."
 
-uv run --with-editable . --with-requirements requirements/dev.txt mypy shared/ bot/ --config-file pyproject.toml
+uv run --python 3.12 --no-project --with-requirements requirements/dev.txt mypy shared/ bot/ --config-file pyproject.toml
 
 echo "✅ Type checking completed successfully"

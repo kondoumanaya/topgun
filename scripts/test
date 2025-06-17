@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+echo "🧪 Running tests with coverage..."
+
+uv run \
+    --python 3.12 \
+    --no-project \
+    --with-requirements requirements/test.txt \
+    pytest --cov=shared --cov=bot --cov-report=term-missing
+
+echo "✅ Tests completed successfully"
