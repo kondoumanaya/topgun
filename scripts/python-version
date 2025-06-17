@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+# Output Python versions as JSON array for GitHub Actions matrix
+# Based on pyproject.toml requires-python >= 3.12
+echo '["3.12"]'

@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+echo "🔍 Running type checking with mypy..."
+
+uv run --with-editable . --with-requirements requirements/dev.txt mypy shared/ bot/ --config-file pyproject.toml
+
+echo "✅ Type checking completed successfully"
