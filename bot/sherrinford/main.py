@@ -11,7 +11,6 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -153,8 +152,6 @@ try:
 except ImportError as e:
     print(f"❌ 共有モジュールインポートエラー: {e}")
     raise
-
-
 
 
 @dataclass
@@ -366,9 +363,11 @@ class SherrinfordBot:
                 return False
 
             # 環境別制限
-            if ENVIRONMENT == "development" and quantity > 0.01:  # 開発環境では小額に制限
-                    self.logger.warning(f"⚠️ 開発環境での量制限: {quantity} > 0.01")
-                    return False
+            if (
+                ENVIRONMENT == "development" and quantity > 0.01
+            ):  # 開発環境では小額に制限
+                self.logger.warning(f"⚠️ 開発環境での量制限: {quantity} > 0.01")
+                return False
 
             # エラー頻発時の取引停止
             if self.error_count > 10:
