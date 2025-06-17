@@ -1,0 +1,32 @@
+bot:
+  name: "sherrinford"
+  strategy: "high_frequency_scalping"
+  description: "高速スキャルピング戦略"
+
+cache:
+  ttl: 1 # 1秒間キャッシュ（高速更新）
+  key_prefix: "sherrinford" # キー競合回避
+  max_keys: 10000 # 大量のキー保持
+  cleanup_interval: 60 # 1分ごとにクリーンアップ
+
+trading:
+  max_position_size: 0.001 # 小さなポジション
+  risk_limit: 0.005 # 超低リスク
+  order_timeout: 5 # 高速執行
+  heartbeat_interval: 10 # 頻繁なヘルスチェック
+  max_daily_trades: 1000 # 高頻度取引
+  max_daily_loss: 50 # 小さな損失限度
+  min_profit_threshold: 0.0001 # 小さな利益でも確定
+
+risk_management:
+  stop_loss_ratio: 0.001 # 0.1%で即損切り
+  take_profit_ratio: 0.002 # 0.2%で利確
+  max_drawdown: 0.01 # 1%で全停止
+  position_sizing: "fixed" # 固定サイズ
+
+performance:
+  execution_speed: "ultra_fast" # 最高速
+  latency_threshold: 1 # 1ms以上で警告
+  tick_interval: 0.001 # 1msごとにチェック
+
+#とりあえず初期値を入れてるが、最終的に自動最適値を計算させる。

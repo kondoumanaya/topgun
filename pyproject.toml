@@ -1,0 +1,242 @@
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "root-bot"
+version = "0.1.0"
+description = "High-performance cryptocurrency trading bot system using topgun"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "kondo", email = "" },
+]
+keywords = ["trading", "bot", "cryptocurrency", "finance", "automation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+]
+
+dependencies = [
+    "topgun",
+    # Configuration & Environment
+    "pyyaml>=6.0.1",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+
+    # Database & Cache
+    "asyncpg>=0.29.0",
+    "redis[hiredis]>=5.0.0",
+    "sqlalchemy[asyncio]>=2.0.0",
+    "alembic>=1.13.0",
+
+    # HTTP & WebSocket
+    "aiohttp>=3.9.0",
+    "websockets>=12.0",
+    "httpx>=0.25.0",
+
+    # Data Processing
+    "pandas>=2.1.0",
+    "numpy>=1.24.0",
+    "orjson>=3.9.0",
+
+    # Logging & Monitoring
+    "structlog>=23.2.0",
+    "rich>=13.7.0",
+
+    # Async & Concurrency
+    "asyncio-mqtt>=0.16.0",
+    "tenacity>=8.2.0",
+
+    # Security
+    "cryptography>=41.0.0",
+    "python-jose[cryptography]>=3.3.0",
+
+    # Time & Date
+    "python-dateutil>=2.8.0",
+    "pytz>=2023.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "mypy>=1.7.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "pre-commit>=3.5.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.12.0",
+    "pytest-postgresql>=5.0.0",
+    "pytest-redis>=3.0.0",
+    "factory-boy>=3.3.0",
+]
+monitoring = [
+    "prometheus-client>=0.19.0",
+    "psutil>=5.9.0",
+]
+performance = [
+    "cProfile",
+    "memory-profiler>=0.61.0",
+    "py-spy>=0.3.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["shared*", "bots*"]
+exclude = ["topgun*", "tests*", "docs*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.yml", "*.json", "*.toml"]
+
+[project.scripts]
+sherrinford = "bots.sherrinford.main:main"
+watson = "bots.watson.main:main"
+root-bot = "shared.cli:main"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"]}
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+namespace_packages = true
+
+# モジュール別設定
+[[tool.mypy.overrides]]
+module = "topgun.*"
+ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = [
+    "aiohttp.*",
+    "websockets.*",
+    "redis.*",
+    "asyncpg.*",
+    "pandas.*",
+    "numpy.*",
+]
+ignore_missing_imports = true
+
+# テストファイルは緩和
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "B",      # flake8-bugbear
+    "I",      # isort
+    "UP",     # pyupgrade
+    "SIM",    # flake8-simplify
+    "C4",     # flake8-comprehensions
+    "PIE",    # flake8-pie
+    "T20",    # flake8-print
+    "PYI",    # flake8-pyi
+    "Q",      # flake8-quotes
+    "RET",    # flake8-return
+    "S",      # flake8-bandit
+    "TCH",    # flake8-type-checking
+]
+ignore = [
+    "E501",   # line too long
+    "S101",   # assert usage
+    "T201",   # print statements (for debugging)
+]
+
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = ["S101", "S106", "S311"]
+"bots/*/config.py" = ["S105", "S106"]
+
+[tool.black]
+target-version = ['py312']
+line-length = 88
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | topgun/_static_dependencies
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["shared", "bots", "topgun"]
+known_third_party = ["aiohttp", "asyncpg", "redis", "pandas", "numpy"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config --cov=shared --cov=bots"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests", 
+    "unit: marks tests as unit tests",
+    "bot: marks tests as bot-specific tests",
+]
+
+[tool.coverage.run]
+source = ["shared", "bots"]
+omit = [
+    "tests/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/__pycache__/*",
+]
+branch = true
+
+[tool.coverage.report] 
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+fail_under = 80

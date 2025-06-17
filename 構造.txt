@@ -1,0 +1,41 @@
+BOTディレクトリ構造
+root-bot/
+├── bots/
+│   ├── sherrinford/
+│   │   ├── main.py
+│   │   ├── config.yaml
+│   │   ├── requirements.txt          # ボット固有の依存関係
+│   │   └── Dockerfile               # ボット専用Dockerfile
+│   └── bot_b/
+│       ├── main.py
+│       ├── config.yaml
+│       ├── requirements.txt
+│       └── Dockerfile
+│
+├── topgun/                          # 共有ライブラリ
+│   └── topgun/
+│       ├── __init__.py
+│       ├── helpers/
+│       └── _static_dependencies/
+│
+├── shared/                          # 共有ユーティリティ
+│   ├── __init__.py
+│   ├── logger.py
+│   ├── notifier.py
+│   ├── database.py
+│   └── monitoring.py
+│
+├── docker/
+│   ├── base.Dockerfile              # ベースイメージ
+│   ├── docker-compose.yml
+│   ├── docker-compose.prod.yml      # 本番用設定
+│   └── .dockerignore
+│
+├── config/                          # 環境別設定
+│   ├── development.env
+│   ├── staging.env
+│   └── production.env
+│
+├── requirements.txt                 # 共通依存関係
+├── .env                            # ローカル開発用
+└── README.md
