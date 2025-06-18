@@ -1,5 +1,3 @@
-import pytest
-
 from shared.redis_keys import RedisKeys
 
 
