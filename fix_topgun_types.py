@@ -8,24 +8,25 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def create_type_files():
     """型情報ファイルの作成"""
     print("🔧 型情報ファイル作成開始...")
-    
+
     base_path = Path("/Users/manayakondou/Documents/workspace/root-bot/topgun/topgun")
-    
+
     # 1. メインのpy.typedを確認・更新
     main_py_typed = base_path / "py.typed"
     if not main_py_typed.exists() or not main_py_typed.read_text().strip():
         main_py_typed.write_text("partial\n")
         print(f"✅ Created/Updated: {main_py_typed}")
-    
+
     # 2. helpersディレクトリのpy.typed作成
     helpers_dir = base_path / "helpers"
     helpers_py_typed = helpers_dir / "py.typed"
     helpers_py_typed.write_text("partial\n")
     print(f"✅ Created: {helpers_py_typed}")
-    
+
     # 3. bitbank.pyi型スタブ作成
     bitbank_pyi = helpers_dir / "bitbank.pyi"
     bitbank_stub_content = '''"""
@@ -114,10 +115,10 @@ def format_timestamp(timestamp: Union[int, float]) -> str:
     """Format timestamp for API requests"""
     ...
 '''
-    
+
     bitbank_pyi.write_text(bitbank_stub_content)
     print(f"✅ Created: {bitbank_pyi}")
-    
+
     # 4. helpers/__init__.pyi作成
     helpers_init_pyi = helpers_dir / "__init__.pyi"
     helpers_init_content = '''"""
@@ -129,16 +130,19 @@ __all__ = ["bitbank"]
 '''
     helpers_init_pyi.write_text(helpers_init_content)
     print(f"✅ Created: {helpers_init_pyi}")
-    
+
     return True
+
 
 def create_mypy_config():
     """mypy設定ファイルの作成/更新"""
     print("\n🔧 mypy設定ファイル作成...")
-    
-    config_path = Path("/Users/manayakondou/Documents/workspace/root-bot/pyproject.toml")
-    
-    mypy_config = '''
+
+    config_path = Path(
+        "/Users/manayakondou/Documents/workspace/root-bot/pyproject.toml"
+    )
+
+    mypy_config = """
 [tool.mypy]
 python_version = "3.12"
 warn_return_any = true
@@ -168,8 +172,8 @@ module = [
     "asyncio.*"
 ]
 ignore_missing_imports = true
-'''
-    
+"""
+
     if config_path.exists():
         content = config_path.read_text()
         if "[tool.mypy]" not in content:
@@ -181,22 +185,23 @@ ignore_missing_imports = true
     else:
         config_path.write_text(mypy_config)
         print(f"✅ Created: {config_path}")
-    
+
     return config_path.exists()
+
 
 def verify_files():
     """作成されたファイルの確認"""
     print("\n🔍 作成ファイル確認...")
-    
+
     base_path = Path("/Users/manayakondou/Documents/workspace/root-bot/topgun/topgun")
-    
+
     files_to_check = [
         (base_path / "py.typed", "Main py.typed marker"),
         (base_path / "helpers" / "py.typed", "Helpers py.typed marker"),
         (base_path / "helpers" / "bitbank.pyi", "Bitbank type stub"),
         (base_path / "helpers" / "__init__.pyi", "Helpers init stub"),
     ]
-    
+
     all_good = True
     for file_path, description in files_to_check:
         if file_path.exists() and file_path.stat().st_size > 0:
@@ -205,35 +210,38 @@ def verify_files():
         else:
             print(f"❌ {description}: Missing or empty")
             all_good = False
-    
+
     return all_good
+
 
 def test_mypy():
     """mypy テストの実行"""
     print("\n🧪 mypy テスト実行...")
-    
+
     test_file = "/Users/manayakondou/Documents/workspace/root-bot/topgun/examples/helpers/bitbank.py"
-    
+
     if not Path(test_file).exists():
         print(f"❌ テストファイルが見つかりません: {test_file}")
         return False
-    
+
     try:
         # mypy実行
         cmd = [
-            sys.executable, "-m", "mypy",
+            sys.executable,
+            "-m",
+            "mypy",
             "--show-error-codes",
             "--pretty",
-            test_file
+            test_file,
         ]
-        
+
         result = subprocess.run(
             cmd,
             cwd="/Users/manayakondou/Documents/workspace/root-bot",
             capture_output=True,
-            text=True
+            text=True,
         )
-        
+
         if result.returncode == 0:
             print("✅ mypy チェック成功! エラーなし")
             return True
@@ -246,7 +254,7 @@ def test_mypy():
                 print("STDERR:")
                 print(result.stderr)
             return False
-            
+
     except FileNotFoundError:
         print("❌ mypy が見つかりません")
         print("以下のコマンドでインストール:")
@@ -256,24 +264,26 @@ def test_mypy():
         print(f"❌ mypy テスト実行エラー: {e}")
         return False
 
+
 def test_import():
     """インポートテストの実行"""
     print("\n🧪 インポートテスト実行...")
-    
+
     try:
         # プロジェクトルートをパスに追加
         project_root = "/Users/manayakondou/Documents/workspace/root-bot"
         if project_root not in sys.path:
             sys.path.insert(0, project_root)
-        
+
         # インポートテスト
         from topgun.helpers.bitbank import subscribe_with_callback
+
         print("✅ subscribe_with_callback インポート成功")
         print(f"   Function type: {type(subscribe_with_callback)}")
         print(f"   Function module: {subscribe_with_callback.__module__}")
-        
+
         return True
-        
+
     except ImportError as e:
         print(f"❌ インポートエラー: {e}")
         print("topgunパッケージの構造を確認")
@@ -281,6 +291,7 @@ def test_import():
     except Exception as e:
         print(f"❌ 予期しないエラー: {e}")
         return False
+
 
 def show_next_steps():
     """次のステップの表示"""
@@ -298,45 +309,46 @@ def show_next_steps():
     print("   python topgun/examples/helpers/bitbank.py")
     print("   (環境変数 BITBANK_API_KEY, BITBANK_API_SECRET が必要)")
 
+
 def main():
     """メイン実行関数"""
     print("🚀 topgun 型エラー修正スクリプト開始")
     print("=" * 60)
     print("目的: 'missing library stubs or py.typed marker' エラーの解決")
     print("")
-    
+
     success_count = 0
     total_steps = 5
-    
+
     try:
         # ステップ1: 型ファイル作成
         if create_type_files():
             success_count += 1
             print("✅ ステップ1完了: 型ファイル作成")
-        
+
         # ステップ2: mypy設定
         if create_mypy_config():
             success_count += 1
             print("✅ ステップ2完了: mypy設定")
-        
+
         # ステップ3: ファイル確認
         if verify_files():
             success_count += 1
             print("✅ ステップ3完了: ファイル確認")
-        
+
         # ステップ4: インポートテスト
         if test_import():
             success_count += 1
             print("✅ ステップ4完了: インポートテスト")
-        
+
         # ステップ5: mypyテスト
         if test_mypy():
             success_count += 1
             print("✅ ステップ5完了: mypyテスト")
-        
+
         # 結果表示
         print(f"\n📊 修正結果: {success_count}/{total_steps} ステップ成功")
-        
+
         if success_count == total_steps:
             print("🎉 全ての修正が完了しました!")
             show_next_steps()
@@ -349,11 +361,13 @@ def main():
             print("1. topgun/topgun/helpers/py.typed ファイルを作成")
             print("2. topgun/topgun/helpers/bitbank.pyi ファイルを作成")
             print("3. VSCode Language Server をリスタート")
-        
+
     except Exception as e:
         print(f"❌ 予期しないエラー: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     main()

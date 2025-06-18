@@ -7,7 +7,7 @@ import sys
 from contextlib import suppress
 from typing import Any, Dict, Optional
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'topgun'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "topgun"))
 
 from topgun import Client, GMOCoinDataStore
 
@@ -15,8 +15,7 @@ with suppress(ImportError):
     from rich import print
 
 logging.basicConfig(
-    level=logging.WARNING,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -32,7 +31,7 @@ class GMOBoardWatcher:
     async def start(self) -> None:
         self.client = Client()
         self.store = GMOCoinDataStore()
-        
+
         try:
             await self.client.ws_connect(
                 "wss://api.coin.z.com/ws/public/v1",
@@ -43,10 +42,10 @@ class GMOBoardWatcher:
                 },
                 hdlr_json=self.store.onmessage,
             )
-            
+
             self.running = True
             logger.info(f"Started watching GMO Coin board data for {self.symbol}")
-            
+
             while self.running:
                 if self.store is not None:
                     orderbook = self.store.orderbooks.sorted(limit=5)
@@ -56,9 +55,9 @@ class GMOBoardWatcher:
                         print(f"  Bids: {orderbook.get('bids', [])[:5]}")
                         print(f"  Timestamp: {orderbook.get('timestamp', 'N/A')}")
                         print("---")
-                    
+
                     await self.store.orderbooks.wait()
-                
+
         except Exception as e:
             logger.error(f"Error in board watcher: {e}")
             raise
@@ -77,9 +76,9 @@ class GMOBoardWatcher:
 
 async def main() -> None:
     symbol = os.getenv("GMO_SYMBOL", "BTC_JPY")
-    
+
     watcher = GMOBoardWatcher(symbol=symbol)
-    
+
     try:
         await watcher.start()
     except KeyboardInterrupt:

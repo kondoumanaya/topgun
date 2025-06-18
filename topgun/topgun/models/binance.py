@@ -179,7 +179,7 @@ class BinanceDataStoreBase(DataStoreCollection):
         else:
             params = None
         while not session.closed:
-            async with session.put(url, params=params, auth=Auth) as resp: # type: ignore[arg-type]
+            async with session.put(url, params=params, auth=Auth) as resp:  # type: ignore[arg-type]
                 text = await resp.text()
             try:
                 resp.raise_for_status()

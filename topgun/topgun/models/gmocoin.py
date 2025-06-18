@@ -208,7 +208,7 @@ class GMOCoinDataStore(DataStoreCollection):
             await session.put(
                 "https://api.coin.z.com/private/v1/ws-auth",
                 data={"token": self.token},
-                auth=Auth, # type: ignore[arg-type]
+                auth=Auth,  # type: ignore[arg-type]
             )
             await asyncio.sleep(1800.0)  # 30 minutes
 

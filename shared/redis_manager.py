@@ -4,19 +4,20 @@ from typing import Optional, Any
 import json
 from .redis_keys import RedisKeys
 
+
 class BotRedisManager:
     """Bot固有のRedis管理クラス"""
 
     def __init__(self, bot_name: str, bot_config: dict):
         # 共通接続情報
-        self.host = os.getenv('REDIS_HOST')
-        self.port = int(os.getenv('REDIS_PORT', 6379))
-        self.password = os.getenv('REDIS_PASSWORD')
+        self.host = os.getenv("REDIS_HOST")
+        self.port = int(os.getenv("REDIS_PORT", 6379))
+        self.password = os.getenv("REDIS_PASSWORD")
 
         # Bot固有設定
-        cache_config = bot_config.get('cache', {})
+        cache_config = bot_config.get("cache", {})
         self.bot_name = bot_name
-        self.ttl = cache_config.get('ttl', 60)
+        self.ttl = cache_config.get("ttl", 60)
 
         self.client: Optional[redis.Redis] = None
 
@@ -26,7 +27,7 @@ class BotRedisManager:
             host=self.host,
             port=self.port,
             password=self.password,
-            decode_responses=True
+            decode_responses=True,
         )
         await self.client.ping()
 
