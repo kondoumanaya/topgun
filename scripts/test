@@ -1,0 +1,8 @@
+#!/bin/bash -eux
+
+# Run tests with pytest.
+
+# Run pytest with uv, focusing on project tests only
+uv run \
+    --with-requirements requirements/test.txt \
+    pytest tests/

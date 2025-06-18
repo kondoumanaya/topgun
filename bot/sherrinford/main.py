@@ -3,14 +3,16 @@
 Sherrinford Bot - 環境設定完全対応版 Production Ready Trading Bot
 """
 
-import sys
+import asyncio
+import logging
 import os
 import signal
-import asyncio
+import sys
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
+
 import yaml
-import logging
 from dotenv import load_dotenv
 
 # プロジェクトルート特定
@@ -20,7 +22,7 @@ ROOT_DIR = Path(__file__).parent.parent.parent
 # 環境設定読み込み関数
 def load_environment():
     """環境設定を順序付きで読み込み"""
-    print(f"🔧 環境設定読み込み開始...")
+    print("🔧 環境設定読み込み開始...")
     print(f"📁 Project Root: {ROOT_DIR}")
 
     # 読み込み順序（後のファイルが優先）
@@ -78,12 +80,12 @@ print(f"🧪 Paper Trading: {ENABLE_PAPER_TRADING}")
 
 try:
     # topgun ライブラリ
+    from topgun.topgun.auth import Auth
     from topgun.topgun.helpers.hyperliquid import (
         construct_l1_action,
-        sign_typed_data,
         get_timestamp_ms,
+        sign_typed_data,
     )
-    from topgun.topgun.auth import Auth
 
     print("✅ topgun ライブラリインポート成功")
 
@@ -151,10 +153,6 @@ except ImportError as e:
     print(f"❌ 共有モジュールインポートエラー: {e}")
     raise
 
-# 設定
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-
 
 @dataclass
 class BotConfig:
@@ -181,10 +179,10 @@ class BotConfig:
 class SherrinfordBot:
     """Sherrinford Trading Bot - 環境設定完全対応版"""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         # ログ設定
         self.logger = setup_logger("sherrinford")
-        self.logger.info(f"🚀 Sherrinford Bot 初期化開始")
+        self.logger.info("🚀 Sherrinford Bot 初期化開始")
         self.logger.info(f"📁 Root Directory: {ROOT_DIR}")
         self.logger.info(f"🌍 Environment: {ENVIRONMENT}")
         self.logger.info(f"📊 Log Level: {LOG_LEVEL}")
@@ -219,7 +217,7 @@ class SherrinfordBot:
             config_file = ROOT_DIR / config_path
 
             if config_file.exists():
-                with open(config_file, "r", encoding="utf-8") as f:
+                with open(config_file, encoding="utf-8") as f:
                     config_data = yaml.safe_load(f) or {}
                 self.logger.info("✅ 設定ファイル読み込み成功")
             else:
@@ -230,7 +228,7 @@ class SherrinfordBot:
             config = BotConfig(**config_data)
 
             # 設定内容ログ出力（秘密情報を除く）
-            self.logger.info(f"📊 設定内容:")
+            self.logger.info("📊 設定内容:")
             self.logger.info(f"   Environment: {ENVIRONMENT}")
             self.logger.info(f"   is_mainnet: {config.is_mainnet}")
             self.logger.info(f"   max_position_size: {config.max_position_size}")
@@ -259,7 +257,7 @@ class SherrinfordBot:
 
     async def create_order(
         self, symbol: str, side: str, quantity: float, price: float
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """注文作成"""
         try:
             self.logger.info(f"📋 注文作成開始: {symbol} {side} {quantity}@{price}")
@@ -300,7 +298,7 @@ class SherrinfordBot:
                 action, nonce, self.config.is_mainnet
             )
 
-            self.logger.debug(f"🔐 EIP-712データ構築完了")
+            self.logger.debug("🔐 EIP-712データ構築完了")
 
             # 署名
             signature = sign_typed_data(self.config.private_key, domain, types, message)
@@ -365,10 +363,11 @@ class SherrinfordBot:
                 return False
 
             # 環境別制限
-            if ENVIRONMENT == "development":
-                if quantity > 0.01:  # 開発環境では小額に制限
-                    self.logger.warning(f"⚠️ 開発環境での量制限: {quantity} > 0.01")
-                    return False
+            if (
+                ENVIRONMENT == "development" and quantity > 0.01
+            ):  # 開発環境では小額に制限
+                self.logger.warning(f"⚠️ 開発環境での量制限: {quantity} > 0.01")
+                return False
 
             # エラー頻発時の取引停止
             if self.error_count > 10:
@@ -551,7 +550,7 @@ class SherrinfordBot:
             self.metrics.gauge("bot_status", 0)  # 停止状態
 
             # 最終統計
-            self.logger.info(f"📊 最終統計:")
+            self.logger.info("📊 最終統計:")
             self.logger.info(f"   注文回数: {self.order_count}")
             self.logger.info(f"   エラー回数: {self.error_count}")
             self.logger.info(f"   ポジション数: {len(self.positions)}")

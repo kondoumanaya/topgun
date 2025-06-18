@@ -3,7 +3,6 @@ topgun型エラー完全修正スクリプト
 mypyエラー「missing library stubs or py.typed marker」を解決
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -42,11 +41,11 @@ async def subscribe_with_callback(
 ) -> None:
     """
     Subscribe to bitbank WebSocket with callback function
-    
+
     Args:
         client: Topgun client instance with bitbank API credentials
         callback: Async callback function to handle WebSocket messages
-        
+
     Returns:
         None - runs indefinitely until cancelled
     """
@@ -235,7 +234,7 @@ def test_mypy():
             test_file,
         ]
 
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603
             cmd,
             cwd="/Users/manayakondou/Documents/workspace/root-bot",
             capture_output=True,
@@ -245,15 +244,15 @@ def test_mypy():
         if result.returncode == 0:
             print("✅ mypy チェック成功! エラーなし")
             return True
-        else:
-            print("⚠️  mypy チェック結果:")
-            if result.stdout:
-                print("STDOUT:")
-                print(result.stdout)
-            if result.stderr:
-                print("STDERR:")
-                print(result.stderr)
-            return False
+
+        print("⚠️  mypy チェック結果:")
+        if result.stdout:
+            print("STDOUT:")
+            print(result.stdout)
+        if result.stderr:
+            print("STDERR:")
+            print(result.stderr)
+        return False
 
     except FileNotFoundError:
         print("❌ mypy が見つかりません")

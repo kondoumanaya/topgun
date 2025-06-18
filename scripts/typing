@@ -2,10 +2,9 @@
 
 # Run type checking with mypy.
 
-uv run \
-    --with-editable . \
-    --with-requirements requirements/typing.txt \
-    --with-requirements requirements/test.txt \
-    --isolated \
-    --no-project \
-    mypy
+# Install dependencies and topgun in editable mode
+uv pip install -r requirements/typing.txt
+uv pip install -e ./topgun
+
+# Run mypy using the environment where packages are installed
+python -m mypy bots/
