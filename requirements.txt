@@ -24,10 +24,6 @@ typing-extensions>=4.0.0
 typing-inspect>=0.8.0
 
 mypy-extensions==1.0.0
-typing-inspect==0.9.0
-
-
-python-dotenv>=1.0.0
 
 # [conda-forge] 数値計算（condaでの高速化推奨）
 # pandas>=2.0.0
@@ -37,5 +33,4 @@ python-dotenv>=1.0.0
 # conda-forgeでインストールするパッケージ
 # pip install --ignore-installed の後に実行
 # conda install -c conda-forge pandas numpy scikit-learn matplotlib
-# ===========================================typing-extensions>=4.0.0
-typing-inspect>=0.8.0
+# ===========================================
