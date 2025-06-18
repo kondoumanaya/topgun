@@ -278,7 +278,9 @@ class _CandleStore(DataStore):
 
     def _onmessage(self, msg: dict[str, Any]) -> None:
         for item in msg["data"]:
-            self._update([{**msg["arg"], **dict(zip(self._LIST_KEYS, item))}])
+            self._update(
+                [{**msg["arg"], **dict(zip(self._LIST_KEYS, item, strict=True))}]
+            )
 
 
 class Instruments(_UpdateStore): ...
@@ -340,7 +342,7 @@ class Books(DataStore):
                     item = {
                         "instId": inst_id,
                         "side": side,
-                        **dict(zip(self._LIST_KEYS, item)),
+                        **dict(zip(self._LIST_KEYS, item, strict=True)),
                     }
                     if item["sz"] != "0":
                         self._update([item])

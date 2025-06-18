@@ -12,7 +12,6 @@ from topgun.store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     import aiohttp
-    from aiohttp import BasicAuth
 
     from topgun.typedefs import Item
     from topgun.ws import ClientWebSocketResponse
