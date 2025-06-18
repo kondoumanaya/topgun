@@ -209,6 +209,7 @@ known_third_party = ["aiohttp", "asyncpg", "redis", "pandas", "numpy"]
 minversion = "7.0"
 addopts = "-ra -q --strict-markers --strict-config --cov=shared --cov=bots"
 testpaths = ["tests"]
+pythonpath = ["."]
 asyncio_mode = "auto"
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
