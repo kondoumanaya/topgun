@@ -2,6 +2,9 @@
 
 # Run tests with pytest.
 
+# Set version for setuptools-scm in CI environment
+export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_TOPGUN=1.0.0
+
 # Use uv run with isolated environment for CI compatibility
 uv run \
     --with-requirements requirements/test.txt \
