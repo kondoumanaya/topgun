@@ -2,7 +2,9 @@
 
 # Run tests with pytest.
 
-# Run pytest with uv, focusing on project tests only
-uv run \
-    --with-requirements requirements/test.txt \
-    pytest tests/
+# Install dependencies and topgun in editable mode (use --system for CI)
+uv pip install --system -r requirements/test.txt
+uv pip install --system -e ./topgun
+
+# Run pytest using python module to ensure it's found
+python -m pytest tests/

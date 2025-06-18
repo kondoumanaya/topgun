@@ -2,9 +2,9 @@
 
 # Run type checking with mypy.
 
-# Install dependencies and topgun in editable mode
-uv pip install -r requirements/typing.txt
-uv pip install -e ./topgun
+# Install dependencies and topgun in editable mode (use --system for CI)
+uv pip install --system -r requirements/typing.txt
+uv pip install --system -e ./topgun
 
 # Run mypy using the environment where packages are installed
 python -m mypy bots/

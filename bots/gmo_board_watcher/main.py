@@ -9,7 +9,8 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Dict
+from contextlib import suppress
+from typing import Any
 
 import aiohttp
 
@@ -32,20 +33,20 @@ class GMOBoardWatcher:
     async def start(self) -> None:
         """Start watching GMO Coin board data"""
         self.session = aiohttp.ClientSession()
-        
+
         try:
             self.ws = await self.session.ws_connect("wss://api.coin.z.com/ws/public/v1")
-            
+
             subscribe_msg = {
                 "command": "subscribe",
                 "channel": "orderbooks",
                 "symbol": self.symbol,
             }
             await self.ws.send_str(json.dumps(subscribe_msg))
-            
+
             self.running = True
             logger.info(f"Started watching GMO Coin board data for {self.symbol}")
-            
+
             async for msg in self.ws:
                 if msg.type == aiohttp.WSMsgType.TEXT:
                     try:
@@ -56,23 +57,23 @@ class GMOBoardWatcher:
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     logger.error(f"WebSocket error: {self.ws.exception()}")
                     break
-                    
+
                 if not self.running:
                     break
-                    
+
         except Exception as e:
             logger.error(f"Error in board watcher: {e}")
             raise
         finally:
             await self.cleanup()
 
-    async def _handle_message(self, data: Dict[str, Any]) -> None:
+    async def _handle_message(self, data: dict[str, Any]) -> None:
         """Handle incoming WebSocket message"""
         if data.get("channel") == "orderbooks" and data.get("symbol") == self.symbol:
             asks = data.get("asks", [])[:5]  # Top 5 asks
             bids = data.get("bids", [])[:5]  # Top 5 bids
             timestamp = data.get("timestamp", "N/A")
-            
+
             print(f"[{self.symbol}] Board Data:")
             print(f"  Asks: {asks}")
             print(f"  Bids: {bids}")
@@ -96,9 +97,9 @@ class GMOBoardWatcher:
 async def main() -> None:
     """Main entry point"""
     symbol = os.getenv("GMO_SYMBOL", "BTC_JPY")
-    
+
     watcher = GMOBoardWatcher(symbol=symbol)
-    
+
     try:
         await watcher.start()
     except KeyboardInterrupt:
@@ -111,7 +112,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    try:
+    with suppress(KeyboardInterrupt):
         asyncio.run(main())
-    except KeyboardInterrupt:
-        pass
