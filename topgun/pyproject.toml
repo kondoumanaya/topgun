@@ -9,7 +9,7 @@ description = "topgun"
 requires-python = ">=3.12"
 keywords = ["aiohttp", "crypto", "exchange", "trading"]
 authors = [
-    { name = "kondo", email = "" },
+    { name = "kondo", email = "kondo@example.com" },
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
