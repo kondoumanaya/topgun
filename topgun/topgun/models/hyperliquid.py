@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from topgun.store import DataStore, DataStoreCollection
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from ..typedefs import Item
+    from ..ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 

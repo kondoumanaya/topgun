@@ -3,13 +3,13 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any, Awaitable, cast
 
-from topgun.store import DataStore, DataStoreCollection
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     import aiohttp
 
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from ..typedefs import Item
+    from ..ws import ClientWebSocketResponse
 
 
 class CoincheckDataStore(DataStoreCollection):

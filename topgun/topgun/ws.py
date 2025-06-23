@@ -20,7 +20,7 @@ from urllib.parse import urlencode
 
 import aiohttp
 
-from topgun.auth import Auth as _Auth
+from .auth import Auth as _Auth
 
 if TYPE_CHECKING:
     from collections.abc import (

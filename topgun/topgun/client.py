@@ -11,15 +11,15 @@ from urllib.parse import urlparse
 import aiohttp
 from aiohttp import hdrs
 
-from topgun.__version__ import __version__
-from topgun.auth import Auth, PassphraseRequiredExchanges
-from topgun.request import ClientRequest
-from topgun.ws import ClientWebSocketResponse, WebSocketApp
+from .__version__ import __version__
+from .auth import Auth, PassphraseRequiredExchanges
+from .request import ClientRequest
+from .ws import ClientWebSocketResponse, WebSocketApp
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from topgun.typedefs import (
+    from .typedefs import (
         APICredentialsDict,
         EncodedAPICredentialsDict,
         RequestContextManager,

@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class RedisKeys:
     """Redis キーテンプレートの定義"""
 
@@ -25,6 +28,6 @@ class RedisKeys:
     SCALPING_OPPORTUNITY = "{bot_name}:scalping:{symbol}"
 
     @classmethod
-    def make_key(cls, template: str, bot_name: str, **kwargs) -> str:
+    def make_key(cls, template: str, bot_name: str, **kwargs: Any) -> str:
         """キーテンプレートから実際のキーを生成"""
         return template.format(bot_name=bot_name, **kwargs)

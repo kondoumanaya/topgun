@@ -186,9 +186,7 @@ def test_client_request_post(
     )
 
 
-def test_client_get(
-    mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client
-):
+def test_client_get(mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client):
     patched = mocker.patch("aiohttp.ClientSession._request", new_callable=MagicMock)
 
     topgun_client.get("http://example.com", params={"foo": "bar"})
@@ -202,9 +200,7 @@ def test_client_get(
     )
 
 
-def test_client_post(
-    mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client
-):
+def test_client_post(mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client):
     patched = mocker.patch("aiohttp.ClientSession._request", new_callable=MagicMock)
 
     topgun_client.post("http://example.com", data={"foo": "bar"})
@@ -218,9 +214,7 @@ def test_client_post(
     )
 
 
-def test_client_put(
-    mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client
-):
+def test_client_put(mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client):
     patched = mocker.patch("aiohttp.ClientSession._request", new_callable=MagicMock)
 
     topgun_client.put("http://example.com", data={"foo": "bar"})
@@ -234,9 +228,7 @@ def test_client_put(
     )
 
 
-def test_client_delete(
-    mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client
-):
+def test_client_delete(mocker: pytest_mock.MockerFixture, topgun_client: topgun.Client):
     patched = mocker.patch("aiohttp.ClientSession._request", new_callable=MagicMock)
 
     topgun_client.delete(

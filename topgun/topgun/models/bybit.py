@@ -4,14 +4,14 @@ import asyncio
 import logging
 from typing import TYPE_CHECKING, Awaitable
 
-from topgun.store import DataStore, DataStoreCollection
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     import aiohttp
     from yarl import URL
 
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from ..typedefs import Item
+    from ..ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 

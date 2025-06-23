@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 if TYPE_CHECKING:
     from collections.abc import Hashable, Iterator
 
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from .typedefs import Item
+    from .ws import ClientWebSocketResponse
 
 
 class DataStore:

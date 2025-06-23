@@ -8,14 +8,13 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, Awaitable, TypedDict, cast
 
 from topgun.auth import Auth
-from topgun.store import DataStore, DataStoreCollection
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     import aiohttp
-    from aiohttp import BasicAuth
 
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from ..typedefs import Item
+    from ..ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 
@@ -653,12 +652,12 @@ class GMOCoinDataStore(DataStoreCollection):
             elif channel == Channel.POSITION_SUMMARY_EVENTS:
                 self.position_summary._onmessage(MessageHelper.to_position_summary(msg))
 
-    async def _token(self, session: aiohttp.ClientSession):
+    async def _token(self, session: aiohttp.ClientSession) -> None:
         while not session.closed:
             await session.put(
                 "https://api.coin.z.com/private/v1/ws-auth",
                 data={"token": self.token},
-                auth=Auth, # type: ignore[arg-type]
+                auth=Auth,  # type: ignore[arg-type]
             )
             await asyncio.sleep(1800.0)  # 30 minutes
 
