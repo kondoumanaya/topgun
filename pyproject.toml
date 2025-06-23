@@ -126,24 +126,22 @@ strict_equality = true
 show_error_codes = true
 namespace_packages = true
 
+# Exclude topgun from type checking in root project
+exclude = ["topgun/.*"]
+
 # モジュール別設定
 [[tool.mypy.overrides]]
 module = [
-    "topgun.*",
-    "topgun.topgun._static_dependencies",
-    "topgun.topgun._static_dependencies.*",
     "aiohttp.*",
     "websockets.*",
     "redis.*",
     "asyncpg.*",
     "pandas.*",
     "numpy.*",
+    "yaml.*",
+    "pyyaml.*",
 ]
 ignore_missing_imports = true
-ignore_errors = true
-
-# Exclude topgun from type checking in root project
-exclude = ["topgun/.*"]
 
 # テストファイルは緩和
 [[tool.mypy.overrides]]
