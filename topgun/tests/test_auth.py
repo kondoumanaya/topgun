@@ -155,9 +155,7 @@ def test_item():
 
 
 def test_selector_okx():
-    api_name = topgun.auth.DynamicNameSelector.okx(
-        args=tuple(), kwargs={"headers": {}}
-    )
+    api_name = topgun.auth.DynamicNameSelector.okx(args=tuple(), kwargs={"headers": {}})
     assert api_name == "okx"
 
     api_name = topgun.auth.DynamicNameSelector.okx(
