@@ -15,12 +15,13 @@ root-bot/
 │   ├── gmo_board_watcher/   # GMO板情報取得ボット
 │   ├── sherrinford/         # 高頻度スキャルピングボット
 │   └── watson/              # トレンドフォローボット
-├── shared/                  # 共通モジュール
+├── shared/                  # 共通モジュール・APIキー・共通関数
 │   ├── logger.py            # ログ管理
 │   ├── database.py          # データベース管理
 │   ├── notifier.py          # 通知管理
 │   ├── monitoring.py        # メトリクス収集
-│   └── redis_manager.py     # Redis管理
+│   ├── redis_manager.py     # Redis管理
+│   └── api_keys.py          # APIキー管理（共通）
 ├── topgun/                  # 共通ライブラリ（editable install）
 ├── docker/                  # Docker設定
 │   ├── docker-compose.yml   # 開発環境
@@ -57,6 +58,12 @@ cp env/.env.example env/.env.local
 # 必要な環境変数を設定
 vim env/.env.local
 ```
+
+#### 環境変数の優先順位
+1. `env/.env.local` (最優先 - ローカル開発用)
+2. `env/.env` (基本設定)
+3. `env/.env.production` (本番環境用)
+4. `env/.env.example` (テンプレート)
 
 ### 3. Docker環境での実行
 
@@ -108,3 +115,16 @@ pytest tests/
 2. `main.py`, `requirements.txt`, `Dockerfile` を実装
 3. `docker-compose.yml` にサービスを追加
 4. 共通モジュール（shared/）を活用
+
+## 開発ルール
+
+### shared/ ディレクトリの使用方針
+- **APIキー管理**: 全ボット共通のAPIキーは `shared/api_keys.py` で管理
+- **共通関数**: 複数ボットで使用する関数は `shared/` 配下に配置
+- **ユーティリティ**: ログ、データベース、通知などの共通機能を提供
+
+### env/ ディレクトリの環境変数管理
+- **ファイル構成**: `.env`, `.env.local`, `.env.production`, `.env.example`
+- **読み込み順序**: `.env.local` → `.env` → `.env.production` → `.env.example`
+- **明示的ロード**: 各ボットで `python-dotenv` を使用して明示的に読み込み
+- **セキュリティ**: `.env.local` と `.env.production` は `.gitignore` で除外
