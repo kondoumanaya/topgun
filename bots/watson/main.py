@@ -51,9 +51,9 @@ except ImportError:
         def gauge(self, name: str, value: float) -> None:
             print(f"📊 Gauge {self.name}.{name}: {value}")
     
-    NotificationManager = _FallbackNotificationManager
-    DatabaseManager = _FallbackDatabaseManager
-    MetricsCollector = _FallbackMetricsCollector
+    NotificationManager = _FallbackNotificationManager  # type: ignore
+    DatabaseManager = _FallbackDatabaseManager  # type: ignore
+    MetricsCollector = _FallbackMetricsCollector  # type: ignore
 
 @dataclass
 class WatsonConfig:
