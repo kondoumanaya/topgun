@@ -21,32 +21,39 @@ try:
     from shared.notifier import NotificationManager
     from shared.database import DatabaseManager
     from shared.monitoring import MetricsCollector
+    _SHARED_MODULES_AVAILABLE = True
 except ImportError:
-    def setup_logger(name: str):
+    _SHARED_MODULES_AVAILABLE = False
+    
+    def setup_logger(name: str) -> logging.Logger:
         logging.basicConfig(level=logging.INFO)
         return logging.getLogger(name)
     
-    class NotificationManager:
+    class _FallbackNotificationManager:
         async def send_notification(self, title: str, message: str) -> None:
             print(f"📱 {title}: {message}")
         async def send_alert(self, message: str) -> None:
             print(f"🚨 ALERT: {message}")
     
-    class DatabaseManager:
+    class _FallbackDatabaseManager:
         async def connect(self) -> None:
             pass
         async def close(self) -> None:
             pass
-        async def log_order(self, order_data) -> None:
+        async def log_order(self, order_data: dict) -> None:
             print(f"📝 Order: {order_data}")
     
-    class MetricsCollector:
+    class _FallbackMetricsCollector:
         def __init__(self, name: str):
             self.name = name
         def increment_counter(self, name: str, value: int = 1) -> None:
             print(f"📊 Counter {self.name}.{name}: +{value}")
         def gauge(self, name: str, value: float) -> None:
             print(f"📊 Gauge {self.name}.{name}: {value}")
+    
+    NotificationManager = _FallbackNotificationManager
+    DatabaseManager = _FallbackDatabaseManager
+    MetricsCollector = _FallbackMetricsCollector
 
 @dataclass
 class WatsonConfig:
@@ -72,11 +79,11 @@ class WatsonBot:
         self.metrics = MetricsCollector("watson")
         
         self.is_running = False
-        self.positions = {}
+        self.positions: dict = {}
         
     def _load_config(self, config_path: Optional[str]) -> WatsonConfig:
         """Load configuration from file and environment"""
-        config_data = {}
+        config_data: dict = {}
         
         if config_path and Path(config_path).exists():
             with open(config_path, 'r') as f:

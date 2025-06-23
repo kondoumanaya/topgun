@@ -1,6 +1,6 @@
 """Cache utilities for trading bots"""
 import asyncio
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 import json
 import logging
 
@@ -10,8 +10,8 @@ class SimpleCache:
     """Simple in-memory cache with TTL support"""
     
     def __init__(self, default_ttl: int = 300):
-        self._cache: dict = {}
-        self._ttl: dict = {}
+        self._cache: Dict[str, Any] = {}
+        self._ttl: Dict[str, float] = {}
         self.default_ttl = default_ttl
         
     async def get(self, key: str) -> Optional[Any]:

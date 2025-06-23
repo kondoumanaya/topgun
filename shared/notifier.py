@@ -33,6 +33,8 @@ class NotificationManager:
         
     async def _send_slack(self, title: str, message: str) -> None:
         """Send to Slack webhook"""
+        if not self.slack_webhook:
+            return
         try:
             async with aiohttp.ClientSession() as session:
                 payload = {"text": f"{title}: {message}"}
@@ -42,6 +44,8 @@ class NotificationManager:
             
     async def _send_discord(self, title: str, message: str) -> None:
         """Send to Discord webhook"""
+        if not self.discord_webhook:
+            return
         try:
             async with aiohttp.ClientSession() as session:
                 payload = {"content": f"{title}: {message}"}

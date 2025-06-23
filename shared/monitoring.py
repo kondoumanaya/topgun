@@ -12,7 +12,7 @@ class MetricsCollector:
         self.name = name
         self.counters: Dict[str, int] = {}
         self.gauges: Dict[str, float] = {}
-        self.start_time = time.time()
+        self.start_time: float = time.time()
         
     def increment_counter(self, name: str, value: int = 1) -> None:
         """Increment a counter metric"""
