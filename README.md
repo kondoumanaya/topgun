@@ -1,147 +1,110 @@
-# root-bot
+# Root-Bot Trading System
 
-Crypto trading bot project with shared topgun library.
+高性能な仮想通貨取引ボットシステム。各ボットが独立したコンテナで動作し、共通ライブラリ`topgun`を活用します。
 
-## Project Structure
+## プロジェクト構成
 
 ```
 root-bot/
-├── topgun/                  # 共通非公開パッケージ（pip install -e）
-│   ├── topgun/              # 実装
-│   ├── requirements.txt     # topgun固有の依存関係
-│   └── pyproject.toml       # pip install -e 用
-├── bots/
-│   └── gmo_board_watcher/   # GMOコイン板情報取得bot
-│       ├── main.py
-│       ├── requirements.txt
-│       └── Dockerfile
-├── bot/                     # 既存のbotディレクトリ
-│   ├── sherrinford/
-│   └── watson/
-├── Dockerfile.base          # topgunを含んだ共通ベースイメージ用
-├── requirements.txt         # プロジェクト全体の共通依存関係
-├── mypy.ini                 # 厳密な型チェック設定
-└── README.md
+├── env/                     # 環境変数管理
+│   ├── .env                 # 基本設定
+│   ├── .env.local           # ローカル開発用
+│   ├── .env.production      # 本番環境用
+│   └── .env.example         # 設定テンプレート
+├── bots/                    # 各ボット実装
+│   ├── gmo_board_watcher/   # GMO板情報取得ボット
+│   ├── sherrinford/         # 高頻度スキャルピングボット
+│   └── watson/              # トレンドフォローボット
+├── shared/                  # 共通モジュール
+│   ├── logger.py            # ログ管理
+│   ├── database.py          # データベース管理
+│   ├── notifier.py          # 通知管理
+│   ├── monitoring.py        # メトリクス収集
+│   └── redis_manager.py     # Redis管理
+├── topgun/                  # 共通ライブラリ（editable install）
+├── docker/                  # Docker設定
+│   ├── docker-compose.yml   # 開発環境
+│   ├── docker-compose.test.yml  # テスト環境
+│   └── docker-compose.prod.yml  # 本番環境
+├── config/                  # 設定ファイル
+└── docs/                    # ドキュメント
 ```
 
-## 環境構築
+## セットアップ手順
 
-### 1. Python 環境の準備
-
-Python 3.12.11 以上が必要です：
+### 1. 依存関係のインストール
 
 ```bash
-pyenv local 3.12.8  # または利用可能な3.12.x
-python --version     # Python 3.12.x であることを確認
-```
-
-### 2. 依存関係のインストール
-
-以下の順序で依存関係をインストールしてください：
-
-```bash
-# 1. topgunの依存関係をインストール
-pip install -r topgun/requirements.txt
-
-# 2. topgunをeditable modeでインストール
+# 1. topgunをeditable installでインストール
 pip install -e ./topgun
 
-# 3. プロジェクト全体の共通依存関係をインストール
+# 2. プロジェクト共通依存関係
 pip install -r requirements.txt
 
-# 4. 特定のbotの依存関係をインストール（例：GMO板情報bot）
+# 3. 各ボット固有の依存関係（必要に応じて）
 pip install -r bots/gmo_board_watcher/requirements.txt
+pip install -r bots/sherrinford/requirements.txt
+pip install -r bots/watson/requirements.txt
 ```
 
-### 3. 型チェックの実行
+### 2. 環境設定
 
 ```bash
-# プロジェクト全体の型チェック
-mypy bots/ topgun/
+# 設定テンプレートをコピー
+cp env/.env.example env/.env
+cp env/.env.example env/.env.local
 
-# 特定のディレクトリのみ
-mypy bots/gmo_board_watcher/
+# 必要な環境変数を設定
+vim env/.env.local
 ```
 
-## Docker 運用
-
-### ベースイメージのビルド
+### 3. Docker環境での実行
 
 ```bash
-docker build -f Dockerfile.base -t root-bot-base .
+# 開発環境
+docker-compose -f docker/docker-compose.yml up
+
+# テスト環境
+docker-compose -f docker/docker-compose.test.yml up --profile test
+
+# 本番環境
+docker-compose -f docker/docker-compose.prod.yml up
 ```
 
-### GMO 板情報 bot の実行
+## ボット個別実行
 
+### GMO板情報取得ボット
 ```bash
-# Dockerイメージのビルド
-docker build -t gmo-board-watcher bots/gmo_board_watcher/
-
-# コンテナの実行
-docker run --rm gmo-board-watcher
-
-# 環境変数を指定して実行
-docker run --rm -e GMO_SYMBOL=ETH_JPY gmo-board-watcher
-```
-
-## 開発ワークフロー
-
-### 新しい bot の追加
-
-1. `bots/` ディレクトリに新しい bot ディレクトリを作成
-2. `main.py`, `requirements.txt`, `Dockerfile` を作成
-3. topgun ライブラリを活用して bot 機能を実装
-4. 型チェックと Docker ビルドテストを実行
-
-### 型安全性の確保
-
-- 全ての Python ファイルで型ヒントを使用
-- `mypy --strict` モードで型チェックを通過させる
-- topgun ライブラリには `py.typed` ファイルが含まれています
-
-### セキュリティ
-
-- 全ての Docker コンテナは非 root ユーザー（trader）で実行
-- API キーは環境変数または.env ファイルで管理
-- ソースコードに機密情報を含めない
-
-## GMO 板情報 bot
-
-`bots/gmo_board_watcher/` は、GMO コインの板情報を非同期で取得するサンプル bot です。
-
-### 機能
-
-- GMO コイン WebSocket API に接続
-- 指定された通貨ペアの板情報を取得
-- リアルタイムで板データを標準出力に表示
-
-### 設定
-
-環境変数 `GMO_SYMBOL` で通貨ペアを指定可能（デフォルト: BTC_JPY）
-
-### 実行例
-
-```bash
-# ローカル実行
 cd bots/gmo_board_watcher
 python main.py
-
-# Docker実行
-docker run --rm -e GMO_SYMBOL=BTC_JPY gmo-board-watcher
 ```
 
-## トラブルシューティング
-
-### topgun のインストールエラー
-
-setuptools-scm のバージョン検出エラーが発生する場合：
-
+### Sherrinfordボット（高頻度取引）
 ```bash
-export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_TOPGUN=1.0.0
-pip install -e ./topgun
+cd bots/sherrinford  
+python main.py
 ```
 
-### 型チェックエラー
+### Watsonボット（トレンドフォロー）
+```bash
+cd bots/watson
+python main.py
+```
 
-厳密な型チェックが有効になっているため、全ての関数に型ヒントが必要です。
-`mypy.ini` の設定を確認し、必要に応じて型ヒントを追加してください.
+## 開発ガイド
+
+### 型チェック
+```bash
+mypy bots/ shared/
+```
+
+### テスト実行
+```bash
+pytest tests/
+```
+
+### 新しいボットの追加
+1. `bots/new_bot/` ディレクトリを作成
+2. `main.py`, `requirements.txt`, `Dockerfile` を実装
+3. `docker-compose.yml` にサービスを追加
+4. 共通モジュール（shared/）を活用

@@ -97,7 +97,7 @@ performance = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["shared*", "bots*"]
-exclude = ["topgun*", "tests*", "docs*"]
+exclude = ["topgun*", "tests*", "docs*", "env*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.yml", "*.json", "*.toml"]
@@ -141,6 +141,9 @@ module = [
 ]
 ignore_missing_imports = true
 ignore_errors = true
+
+# Exclude topgun from type checking in root project
+exclude = ["topgun/.*"]
 
 # テストファイルは緩和
 [[tool.mypy.overrides]]

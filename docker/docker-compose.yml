@@ -1,137 +1,121 @@
 version: "3.8"
 
 services:
-  # 開発環境用 Sherrinford
+  # GMO Board Watcher Bot
+  gmo-board-watcher:
+    build:
+      context: ..
+      dockerfile: bots/gmo_board_watcher/Dockerfile
+    container_name: gmo-board-watcher
+    env_file:
+      - ../env/.env
+      - ../env/.env.local
+    environment:
+      - PYTHONPATH=/app
+      - GMO_SYMBOL=BTC_JPY
+    volumes:
+      - ../logs:/app/logs:rw
+    restart: unless-stopped
+    networks:
+      - trading_network
+    user: "1000:1000"
+
+  # Sherrinford Bot
   sherrinford:
     build:
       context: ..
-      dockerfile: docker/base.Dockerfile
-      args:
-        - ENVIRONMENT=development
-    image: root-bot-dev:latest
-    container_name: sherrinford-dev
+      dockerfile: bots/sherrinford/Dockerfile
+    container_name: sherrinford
     env_file:
-      - ../config/development.env
+      - ../env/.env
+      - ../env/.env.local
     environment:
       - PYTHONPATH=/app
-      - ENVIRONMENT=development
-      - LOG_LEVEL=DEBUG
       - BOT_NAME=sherrinford
-      - BOT_CONFIG_PATH=/app/bots/sherrinford/config.yaml
     volumes:
-      - ../logs/trading:/app/logs/logs:rw
-      - ../data/cache:/app/data/cache:rw
-      - ../bots/sherrinford/config.yml:/app/bots/sherrinford/config.yml:ro
-      - ../bots/sherrinford:/app/bots/sherrinford:ro
-      - ../topgun/topgun:/app/topgun/topgun:ro
-      - ../shared:/app/shared:ro
-    restart: unless-stopped
-    networks:
-      - dev_network
-    depends_on:
-      - postgres
-      - redis
-    command: ["python", "-m", "bots.sherrinford.main"]
-    user: "1000:1000"
-
-  # Watson Bot（独立）
-  watson-bot:
-    build:
-      context: ..
-      dockerfile: docker/base.Dockerfile
-    image: root-bot-base:latest
-    env_file:
-      - ../config/development.env
-    environment:
-      - PYTHONPATH=/app
-      - ENVIRONMENT=development
-      - LOG_LEVEL=WARNING
-      - BOT_NAME=watson
-      - BOT_CONFIG_PATH=/app/bots/watson/config.yaml
-    volumes:
-      - ../logs/trading:/app/logs:rw
-      - ../data/cache:/app/data/cache:rw
-      - ../bots/watson/config.yaml:/app/bots/watson/config.yaml:ro
-      - ../bots/watson:/app/bots/watson:ro
-      - ../topgun/topgun:/app/topgun/topgun:ro
-      - ../shared:/app/shared:ro
+      - ../logs:/app/logs:rw
+      - ../data:/app/data:rw
     restart: unless-stopped
     networks:
       - trading_network
     depends_on:
       - postgres
       - redis
-    command: ["python", "-m", "bots.watson.main"]
     user: "1000:1000"
 
-  # PostgreSQL（dev）
+  # Watson Bot
+  watson:
+    build:
+      context: ..
+      dockerfile: bots/watson/Dockerfile
+    container_name: watson
+    env_file:
+      - ../env/.env
+      - ../env/.env.local
+    environment:
+      - PYTHONPATH=/app
+      - BOT_NAME=watson
+    volumes:
+      - ../logs:/app/logs:rw
+      - ../data:/app/data:rw
+    restart: unless-stopped
+    networks:
+      - trading_network
+    depends_on:
+      - postgres
+      - redis
+    user: "1000:1000"
+
+  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: postgres-dev
-    env_file:
-      - ../config/development.env
+    container_name: postgres_trading
     environment:
       POSTGRES_DB: trading_dev
       POSTGRES_USER: trader
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dev_password_123}
     volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
-      - ../sql/init.dev.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - dev_network
-    command: >
-      postgres
-      -c shared_buffers=128MB
-      -c effective_cache_size=512MB
-      -c random_page_cost=1.1
-      -c wal_buffers=8MB
-      -c max_connections=20
-      -c log_statement=all
-      -c log_min_duration_statement=100
-    # 開発環境では外部アクセス許可
+      - postgres_data:/var/lib/postgresql/data
+      - ../config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
+    networks:
+      - trading_network
+    restart: unless-stopped
 
-  # Redis
+  # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: redis-dev
-    env_file:
-      - ../config/development.env
-    command: >
-      redis-server
-      --requirepass ${REDIS_PASSWORD}
-      --save ""
-      --appendonly no
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru
-      --loglevel verbose
+    container_name: redis_trading
+    command: redis-server --requirepass ${REDIS_PASSWORD:-dev_redis_123}
     volumes:
       - redis_data:/data
-    networks:
-      - dev_network
-    # 開発環境では外部アクセス許可
     ports:
-      - "127.0.0.1:6379:6379"
+      - "6379:6379"
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  # Grafana Monitoring
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_trading
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-dev_grafana_123}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../config/grafana:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - trading_network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
+  grafana_data:
 
 networks:
-  dev_network:
+  trading_network:
     driver: bridge
-    internal: false
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16
-          gateway: 172.20.0.1
-    driver_opts:
-      com.docker.network.driver.mtu: 1500
-      com.docker.network.bridge.name: br-trading-dev
-    labels:
-      - "environment=development"
-      - "purpose=trading-dev"
