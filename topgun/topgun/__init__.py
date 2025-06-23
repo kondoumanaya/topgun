@@ -1,27 +1,27 @@
 from __future__ import annotations
 
-from topgun.__version__ import __version__
-from topgun.auth import Auth
-from topgun.client import Client, FetchResult, NotJSONContent
-from topgun.models.binance import (
+from .__version__ import __version__
+from .auth import Auth
+from .client import Client, FetchResult, NotJSONContent
+from .models.binance import (
     BinanceCOINMDataStore,
     BinanceSpotDataStore,
     BinanceUSDSMDataStore,
 )
-from topgun.models.bitbank import bitbankDataStore, bitbankPrivateDataStore
-from topgun.models.bitflyer import bitFlyerDataStore
-from topgun.models.bitget import BitgetDataStore
-from topgun.models.bitget_v2 import BitgetV2DataStore
-from topgun.models.bitmex import BitMEXDataStore
-from topgun.models.bybit import BybitDataStore
-from topgun.models.coincheck import CoincheckDataStore
-from topgun.models.gmocoin import GMOCoinDataStore
-from topgun.models.hyperliquid import HyperliquidDataStore
-from topgun.models.kucoin import KuCoinDataStore
-from topgun.models.okx import OKXDataStore
-from topgun.models.phemex import PhemexDataStore
-from topgun.store import DataStore, DataStoreCollection, StoreChange, StoreStream
-from topgun.ws import WebSocketApp, WebSocketQueue
+from .models.bitbank import bitbankDataStore, bitbankPrivateDataStore
+from .models.bitflyer import bitFlyerDataStore
+from .models.bitget import BitgetDataStore
+from .models.bitget_v2 import BitgetV2DataStore
+from .models.bitmex import BitMEXDataStore
+from .models.bybit import BybitDataStore
+from .models.coincheck import CoincheckDataStore
+from .models.gmocoin import GMOCoinDataStore
+from .models.hyperliquid import HyperliquidDataStore
+from .models.kucoin import KuCoinDataStore
+from .models.okx import OKXDataStore
+from .models.phemex import PhemexDataStore
+from .store import DataStore, DataStoreCollection, StoreChange, StoreStream
+from .ws import WebSocketApp, WebSocketQueue
 
 __all__: tuple[str, ...] = (
     # version

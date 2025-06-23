@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any, Awaitable
 
 import aiohttp
 
-from topgun.auth import Auth
-from topgun.store import DataStore, DataStoreCollection
+from ..auth import Auth
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     from yarl import URL
 
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from ..typedefs import Item
+    from ..ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 
@@ -179,7 +179,7 @@ class BinanceDataStoreBase(DataStoreCollection):
         else:
             params = None
         while not session.closed:
-            async with session.put(url, params=params, auth=Auth) as resp: # type: ignore[arg-type]
+            async with session.put(url, params=params, auth=Auth) as resp:
                 text = await resp.text()
             try:
                 resp.raise_for_status()

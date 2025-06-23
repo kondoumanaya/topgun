@@ -1050,9 +1050,7 @@ async def test_auth_bitflyer_ws(
     expected,
 ):
     mocker.patch("time.time", return_value=2085848896.0)
-    mocker.patch(
-        "topgun.ws.token_hex", return_value="d73b41172d6deca2285e8e58533db082"
-    )
+    mocker.patch("topgun.ws.token_hex", return_value="d73b41172d6deca2285e8e58533db082")
 
     m_wsresp = AsyncMock()
     m_wsresp._response.url = URL("wss://ws.lightstream.bitflyer.com/json-rpc")

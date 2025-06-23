@@ -8,13 +8,13 @@ import operator
 from decimal import Decimal
 from typing import TYPE_CHECKING, Awaitable
 
-from topgun.store import DataStore, DataStoreCollection
-from topgun.ws import ClientWebSocketResponse
+from ..store import DataStore, DataStoreCollection
+from ..ws import ClientWebSocketResponse
 
 if TYPE_CHECKING:
     import aiohttp
 
-    from topgun.typedefs import Item
+    from ..typedefs import Item
 
 logger = logging.getLogger(__name__)
 
