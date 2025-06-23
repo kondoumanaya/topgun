@@ -125,6 +125,7 @@ warn_unreachable = true
 strict_equality = true
 show_error_codes = true
 namespace_packages = true
+explicit_package_bases = true
 
 # Exclude topgun entirely from root project type checking
 exclude = ["topgun/.*"]
