@@ -126,14 +126,14 @@ strict_equality = true
 show_error_codes = true
 namespace_packages = true
 
-# Exclude topgun from type checking in root project
+# Exclude topgun entirely from root project type checking
 exclude = ["topgun/.*"]
 
 # モジュール別設定
 [[tool.mypy.overrides]]
 module = [
     "aiohttp.*",
-    "websockets.*",
+    "websockets.*", 
     "redis.*",
     "asyncpg.*",
     "pandas.*",
