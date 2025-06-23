@@ -40,8 +40,8 @@ class MetricsCollector:
     def export_prometheus(self) -> str:
         """Export metrics in Prometheus format"""
         lines: list[str] = []
-        for name, value in self.counters.items():
-            lines.append(f"{self.name}_{name}_total {value}")
-        for name, value in self.gauges.items():
-            lines.append(f"{self.name}_{name} {value}")
+        for name, counter_value in self.counters.items():
+            lines.append(f"{self.name}_{name}_total {counter_value}")
+        for name, gauge_value in self.gauges.items():
+            lines.append(f"{self.name}_{name} {gauge_value}")
         return "\n".join(lines)
