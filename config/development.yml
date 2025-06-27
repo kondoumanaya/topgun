@@ -1,0 +1,33 @@
+# Development environment configuration
+extends: base.yml
+
+environment: development
+
+logging:
+  level: DEBUG
+  handlers:
+    - console
+    - file
+
+database:
+  host: localhost
+  port: 5432
+  name: trading_dev
+  user: trader
+
+redis:
+  host: localhost
+  port: 6379
+
+trading:
+  paper_trading: true
+  position_size: 0.01
+  risk_limit: 0.005
+
+monitoring:
+  health_check_interval: 10
+  debug_mode: true
+
+api:
+  rate_limit: 100
+  timeout: 30

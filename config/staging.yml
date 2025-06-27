@@ -1,0 +1,30 @@
+# Staging environment configuration
+extends: base.yml
+
+environment: staging
+
+logging:
+  level: INFO
+  handlers:
+    - console
+    - file
+
+database:
+  pool_size: 10
+  max_overflow: 15
+
+redis:
+  max_connections: 20
+
+trading:
+  paper_trading: true
+  position_size: 0.1
+  risk_limit: 0.01
+
+monitoring:
+  health_check_interval: 30
+  debug_mode: false
+
+api:
+  rate_limit: 500
+  timeout: 20
