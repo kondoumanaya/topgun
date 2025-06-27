@@ -20,15 +20,14 @@ class BotRedisManager:
         cache_config = bot_config.get("cache", {})
         self.bot_name = bot_name
         self.ttl = cache_config.get("ttl", 60)
-
-        self.client: redis.Redis[str] | None = None
+        self.client: redis.Redis | None = None
 
     async def connect(self) -> None:
         """Redis接続"""
         host = self.host or "localhost"
         password = self.password or None
 
-        self.client = redis.Redis[str](
+        self.client = redis.Redis(
             host=host,
             port=self.port,
             password=password,

@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any, Awaitable
 
 import aiohttp
 
-from ..auth import Auth
-from ..store import DataStore, DataStoreCollection
+from topgun.auth import Auth
+from topgun.store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     from yarl import URL
 
-    from ..typedefs import Item
-    from ..ws import ClientWebSocketResponse
+    from topgun.typedefs import Item
+    from topgun.ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 
