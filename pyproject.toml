@@ -97,7 +97,7 @@ performance = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["shared*", "bots*"]
-exclude = ["topgun*", "tests*", "docs*"]
+exclude = ["topgun*", "tests*", "docs*", "env*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.yml", "*.json", "*.toml"]
@@ -125,22 +125,24 @@ warn_unreachable = true
 strict_equality = true
 show_error_codes = true
 namespace_packages = true
+explicit_package_bases = true
+
+# Exclude topgun entirely from root project type checking
+exclude = ["topgun/.*"]
 
 # モジュール別設定
 [[tool.mypy.overrides]]
 module = [
-    "topgun.*",
-    "topgun.topgun._static_dependencies",
-    "topgun.topgun._static_dependencies.*",
     "aiohttp.*",
     "websockets.*",
     "redis.*",
     "asyncpg.*",
     "pandas.*",
     "numpy.*",
+    "yaml.*",
+    "pyyaml.*",
 ]
 ignore_missing_imports = true
-ignore_errors = true
 
 # テストファイルは緩和
 [[tool.mypy.overrides]]
