@@ -45,6 +45,7 @@ jobs:
           docker push ghcr.io/${{ github.repository }}/${{ matrix.bot }}:${{ github.sha }}
 
   deploy:
+    if: false
     needs: build-push
     runs-on: ubuntu-latest
     steps:
