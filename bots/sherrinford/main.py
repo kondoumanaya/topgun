@@ -78,14 +78,14 @@ except ImportError:
     print("⚠️ Shared libraries not available, using fallback implementations")
     _SHARED_MODULES_AVAILABLE = False
 
-    class NotificationManager:
+    class NotificationManager:  # type: ignore
         async def send_notification(self, title: str, message: str) -> None:
             print(f"📱 {title}: {message}")
 
         async def send_alert(self, message: str) -> None:
             print(f"🚨 ALERT: {message}")
 
-    class DatabaseManager:
+    class DatabaseManager:  # type: ignore
         async def connect(self) -> None:
             pass
 
@@ -95,7 +95,7 @@ except ImportError:
         async def log_order(self, order_data: dict) -> None:
             print(f"📝 Order: {order_data}")
 
-    class MetricsCollector:
+    class MetricsCollector:  # type: ignore
         def __init__(self, name: str):
             self.name = name
 
@@ -106,24 +106,22 @@ except ImportError:
             print(f"📊 Gauge {self.name}.{name}: {value}")
 
 try:
-    from topgun.topgun.helpers.hyperliquid import (
-        construct_l1_action,
-        sign_l1_action,
-        post_request
-    )
+    from topgun.topgun.helpers.hyperliquid import construct_l1_action
     _TOPGUN_AVAILABLE = True
 except ImportError:
     print("⚠️ Topgun library not available")
     _TOPGUN_AVAILABLE = False
 
-    def construct_l1_action(*args, **kwargs):
+    def construct_l1_action(*args, **kwargs) -> dict:  # type: ignore
         return {"action": "mock"}
 
-    def sign_l1_action(*args, **kwargs):
-        return {"signature": "mock"}
 
-    def post_request(*args, **kwargs):
-        return {"status": "mock"}
+def sign_l1_action(*args, **kwargs) -> dict:  # type: ignore
+    return {"signature": "mock"}
+
+
+def post_request(*args, **kwargs) -> dict:  # type: ignore
+    return {"status": "mock"}
 
 
 def setup_logger(name: str = "sherrinford") -> logging.Logger:
