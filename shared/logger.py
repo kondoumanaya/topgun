@@ -3,10 +3,11 @@ import queue
 import threading
 import pathlib
 from logging.handlers import RotatingFileHandler
+from typing import Any
 
 
 def setup_logger(bot: str) -> logging.Logger:
-    q = queue.Queue(-1)
+    q: queue.Queue[Any] = queue.Queue(-1)
     root = logging.getLogger(bot)
     root.setLevel(logging.INFO)
 

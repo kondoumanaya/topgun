@@ -18,6 +18,14 @@ from dotenv import load_dotenv
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 ROOT_DIR = Path(__file__).parent.parent.parent
 
+# Global variables - will be set by load_environment()
+API_KEY: str = ""
+PRIVATE_KEY: str = ""
+IS_MAINNET: bool = False
+LOG_LEVEL: str = "INFO"
+MAX_POSITION_SIZE: float = 1.0
+RISK_LIMIT: float = 0.1
+
 
 def load_environment():
     """Load environment configuration in priority order"""
@@ -65,8 +73,10 @@ try:
     from shared.notifier import NotificationManager
     from shared.database import DatabaseManager
     from shared.monitoring import MetricsCollector
+    _SHARED_MODULES_AVAILABLE = True
 except ImportError:
     print("⚠️ Shared libraries not available, using fallback implementations")
+    _SHARED_MODULES_AVAILABLE = False
 
     class NotificationManager:
         async def send_notification(self, title: str, message: str) -> None:
@@ -101,8 +111,10 @@ try:
         sign_l1_action,
         post_request
     )
+    _TOPGUN_AVAILABLE = True
 except ImportError:
     print("⚠️ Topgun library not available")
+    _TOPGUN_AVAILABLE = False
 
     def construct_l1_action(*args, **kwargs):
         return {"action": "mock"}
@@ -116,16 +128,18 @@ except ImportError:
 
 def setup_logger(name: str = "sherrinford") -> logging.Logger:
     """Setup logger with proper configuration"""
-    try:
-        from shared.logger import setup_logger as shared_setup_logger
-        return shared_setup_logger(name)
-    except ImportError:
-        logging.basicConfig(
-            level=getattr(logging, LOG_LEVEL),
-            format='%(asctime)s - %(name)s - %(levelname)s - '
-                   '%(funcName)s:%(lineno)d - %(message)s'
-        )
-        return logging.getLogger(name)
+    if _SHARED_MODULES_AVAILABLE:
+        try:
+            from shared.logger import setup_logger as shared_setup_logger
+            return shared_setup_logger(name)
+        except ImportError:
+            pass
+    logging.basicConfig(
+        level=getattr(logging, LOG_LEVEL),
+        format='%(asctime)s - %(name)s - %(levelname)s - '
+               '%(funcName)s:%(lineno)d - %(message)s'
+    )
+    return logging.getLogger(name)
 
 
 @dataclass
@@ -136,7 +150,7 @@ class BotConfig:
     is_mainnet: bool = False
     max_position_size: float = 1.0
     risk_limit: float = 0.1
-    symbols: list = None
+    symbols: Optional[list[str]] = None
 
     def __post_init__(self):
         if self.symbols is None:
@@ -159,7 +173,7 @@ class SherrinfordBot:
         self.running = False
         self.order_count = 0
         self.error_count = 0
-        self.last_heartbeat = None
+        self.last_heartbeat: Optional[datetime] = None
 
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
@@ -191,14 +205,15 @@ class SherrinfordBot:
                 self.logger.warning("⚠️ Risk check failed, order rejected")
                 return None
 
+            action_dict = {
+                "type": "order",
+                "symbol": symbol,
+                "side": side,
+                "quantity": quantity,
+                "price": price
+            }
             action = construct_l1_action(
-                symbol=symbol,
-                side=side,
-                quantity=quantity,
-                price=price,
-                is_mainnet=self.config.is_mainnet
-            )
-
+                action_dict, 0, self.config.is_mainnet)
             self.logger.debug("🔐 EIP-712 data constructed")
 
             signed_action = sign_l1_action(

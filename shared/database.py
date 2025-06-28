@@ -19,6 +19,8 @@ class DatabaseManager:
         logger.info(f"🗄️ SQLite connected: {self.db_path}")
 
     async def _create_tables(self) -> None:
+        if self.connection is None:
+            raise RuntimeError("Database not connected")
         await self.connection.execute("""
             CREATE TABLE IF NOT EXISTS orders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

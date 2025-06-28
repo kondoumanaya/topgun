@@ -25,9 +25,9 @@ try:
 except ImportError:
     _SHARED_MODULES_AVAILABLE = False
 
-    def setup_logger(name: str) -> logging.Logger:
+    def setup_logger(bot: str) -> logging.Logger:
         logging.basicConfig(level=logging.INFO)
-        return logging.getLogger(name)
+        return logging.getLogger(bot)
 
     class _FallbackNotificationManager:
 
