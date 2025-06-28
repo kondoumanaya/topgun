@@ -127,7 +127,7 @@ namespace_packages = true
 explicit_package_bases = true
 
 # Exclude topgun entirely from root project type checking
-exclude = ["topgun"]
+exclude = "^topgun/.*$"
 
 # モジュール別設定
 [[tool.mypy.overrides]]
