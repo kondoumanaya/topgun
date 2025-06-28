@@ -14,9 +14,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install --upgrade pip
-      - run: pip install flake8 mypy pytest python-dotenv aiosqlite httpx redis types-PyYAML pyyaml
+      - run: pip install -e .
+      - run: pip install flake8 mypy pytest
       - run: flake8 bots shared --count --statistics
-      - run: echo "Mypy temporarily disabled due to topgun module path conflicts"
+      - run: |
+          mkdir -p /tmp/mypy_check
+          cp -r bots /tmp/mypy_check/
+          cp -r shared /tmp/mypy_check/
+          cd /tmp/mypy_check
+          mypy bots shared --ignore-missing-imports --show-error-codes
       - run: pytest -q topgun/tests/ || echo "Topgun tests skipped"
 
   build-push:
