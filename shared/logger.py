@@ -1,42 +1,45 @@
 import logging
-import os
-import sys
+import queue
+import threading
+import pathlib
+import time
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 
-
-def setup_logger(name: str) -> logging.Logger:
-    """本番対応ログ設定"""
-
-    logger = logging.getLogger(name)
-
-    # 既存ハンドラをクリア
-    logger.handlers.clear()
-
-    # ログレベル設定
-    log_level = os.getenv("LOG_LEVEL", "INFO")
-    logger.setLevel(getattr(logging, log_level))
-
-    # フォーマッタ
+def setup_logger(bot: str) -> logging.Logger:
+    q = queue.Queue(-1)
+    root = logging.getLogger(bot)
+    root.setLevel(logging.INFO)
+    
+    root.handlers.clear()
+    
+    queue_handler = logging.handlers.QueueHandler(q)
+    root.addHandler(queue_handler)
+    
+    logdir = pathlib.Path("/app/logs")
+    logdir.mkdir(exist_ok=True)
+    
+    file_handler = RotatingFileHandler(
+        logdir / f"{bot}.log", 
+        maxBytes=1_000_000, 
+        backupCount=3, 
+        encoding="utf-8"
+    )
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
     )
-
-    # コンソールハンドラ
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    # ファイルハンドラ
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-
-    file_handler = RotatingFileHandler(
-        log_dir / f"{name}.log",
-        maxBytes=10 * 1024 * 1024,  # 10MB
-        backupCount=5,
-    )
     file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
-    return logger
+    
+    def _listen():
+        while True:
+            try:
+                record = q.get()
+                if record is None:
+                    break
+                file_handler.emit(record)
+            except Exception:
+                pass
+    
+    listener_thread = threading.Thread(target=_listen, daemon=True)
+    listener_thread.start()
+    
+    return root
