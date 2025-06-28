@@ -380,12 +380,7 @@ class SherrinfordBot:
     async def execute_trading_logic(self) -> None:
         """Execute main trading logic"""
         try:
-
-            if ENVIRONMENT == "development":
-                sample_order = await self.create_order(
-                    "BTC", "buy", 0.001, 50000.0)
-                if sample_order:
-                    self.logger.info(f"✅ Sample order created: {sample_order}")
+            pass
 
         except Exception as e:
             self.logger.error(f"💥 Trading logic error: {e}")

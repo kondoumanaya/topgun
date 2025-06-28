@@ -27,10 +27,14 @@ class BotRedisManager:
         host = self.host or "localhost"
         password = self.password or None
 
+        db_mapping = {"sherrinford": 0, "watson": 1, "gmo_board_watcher": 2}
+        db_number = db_mapping.get(self.bot_name, 0)
+
         self.client = redis.Redis(
             host=host,
             port=self.port,
             password=password,
+            db=db_number,
             decode_responses=True,
         )
         await self.client.ping()

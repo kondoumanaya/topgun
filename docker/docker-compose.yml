@@ -96,25 +96,9 @@ services:
       - trading_network
     restart: unless-stopped
 
-  # Grafana Monitoring
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana_trading
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-dev_grafana_123}
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ../config/grafana:/etc/grafana/provisioning:ro
-    ports:
-      - "3000:3000"
-    networks:
-      - trading_network
-    restart: unless-stopped
-
 volumes:
   postgres_data:
   redis_data:
-    grafana_data:
 
 networks:
   trading_network:
