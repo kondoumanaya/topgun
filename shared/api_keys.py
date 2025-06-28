@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class APIKeyManager:
     """APIキー管理クラス"""
 
@@ -45,7 +46,8 @@ class APIKeyManager:
 
     def get_binance_credentials(self) -> tuple[Optional[str], Optional[str]]:
         """BinanceのAPIキーを取得"""
-        return self._keys.get("binance_api_key"), self._keys.get("binance_secret_key")
+        return (self._keys.get("binance_api_key"), 
+                self._keys.get("binance_secret_key"))
 
     def get_notification_webhooks(self) -> Dict[str, Optional[str]]:
         """通知用WebhookURLを取得"""
@@ -73,5 +75,6 @@ class APIKeyManager:
             return False
 
         return True
+
 
 api_keys = APIKeyManager()

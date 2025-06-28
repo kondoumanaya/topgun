@@ -5,6 +5,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
+
 class MetricsCollector:
     """Collects and manages bot metrics"""
 
