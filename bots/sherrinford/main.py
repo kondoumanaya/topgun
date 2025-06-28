@@ -62,7 +62,6 @@ PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 MAX_POSITION_SIZE = float(os.getenv("MAX_POSITION_SIZE", "1.0"))
 RISK_LIMIT = float(os.getenv("RISK_LIMIT", "0.05"))
 DEBUG_MODE = os.getenv("DEBUG_MODE", "false").lower() == "true"
-ENABLE_PAPER_TRADING = os.getenv("ENABLE_PAPER_TRADING", "false").lower() == "true"
 
 print(f"🌍 Environment: {ENVIRONMENT}")
 print(f"📊 Log Level: {LOG_LEVEL}")
@@ -71,7 +70,6 @@ print(f"🔑 API Key: {'設定済み' if API_KEY else '未設定'}")
 print(f"🔐 Private Key: {'設定済み' if PRIVATE_KEY else '未設定'}")
 print(f"🎯 Max Position Size: {MAX_POSITION_SIZE}")
 print(f"⚠️  Risk Limit: {RISK_LIMIT}")
-print(f"🧪 Paper Trading: {ENABLE_PAPER_TRADING}")
 
 try:
     # topgun ライブラリ
@@ -152,7 +150,6 @@ class BotConfig:
     max_position_size: float = 1.0
     risk_limit: float = 0.05
     symbols: list[str] = field(default_factory=lambda: ["BTC", "ETH"])
-    enable_paper_trading: bool = False
     
     def __post_init__(self):
         # 環境変数から設定を取得（優先）
@@ -161,7 +158,6 @@ class BotConfig:
         self.is_mainnet = IS_MAINNET
         self.max_position_size = MAX_POSITION_SIZE
         self.risk_limit = RISK_LIMIT
-        self.enable_paper_trading = ENABLE_PAPER_TRADING
 
 class SherrinfordBot:
     """Sherrinford Trading Bot - 環境設定完全対応版"""
@@ -221,7 +217,6 @@ class SherrinfordBot:
             self.logger.info(f"   max_position_size: {config.max_position_size}")
             self.logger.info(f"   risk_limit: {config.risk_limit}")
             self.logger.info(f"   symbols: {config.symbols}")
-            self.logger.info(f"   enable_paper_trading: {config.enable_paper_trading}")
             self.logger.info(f"   api_key: {'設定済み' if config.api_key else '未設定'}")
             self.logger.info(f"   private_key: {'設定済み' if config.private_key else '未設定'}")
             
@@ -242,12 +237,6 @@ class SherrinfordBot:
         """注文作成"""
         try:
             self.logger.info(f"📋 注文作成開始: {symbol} {side} {quantity}@{price}")
-            
-            # Paper Trading チェック
-            if self.config.enable_paper_trading:
-                self.logger.info("🧪 Paper Trading モード - 実際の注文は行いません")
-                await self._simulate_order(symbol, side, quantity, price)
-                return {"simulation": True, "symbol": symbol, "side": side}
             
             # リスク管理チェック
             if not self._risk_check(symbol, quantity):
@@ -293,7 +282,6 @@ class SherrinfordBot:
                 "signature": signature,
                 "timestamp": datetime.now(),
                 "environment": ENVIRONMENT,
-                "paper_trading": self.config.enable_paper_trading
             })
             
             # メトリクス更新
@@ -309,20 +297,6 @@ class SherrinfordBot:
             self.error_count += 1
             await self.notifier.send_alert(f"注文エラー: {e}")
             return None
-    
-    async def _simulate_order(self, symbol: str, side: str, quantity: float, price: float):
-        """Paper Trading用の注文シミュレーション"""
-        self.logger.info(f"🧪 シミュレーション注文: {symbol} {side} {quantity}@{price}")
-        
-        # シミュレーション用の遅延
-        await asyncio.sleep(0.1)
-        
-        # ポジション更新（シミュレーション）
-        current_position = self.positions.get(symbol, 0)
-        new_position = current_position + (quantity if side == "buy" else -quantity)
-        self.positions[symbol] = new_position
-        
-        self.logger.info(f"📊 {symbol} ポジション更新: {current_position} → {new_position}")
     
     def _risk_check(self, symbol: str, quantity: float) -> bool:
         """リスク管理チェック"""
@@ -363,7 +337,7 @@ class SherrinfordBot:
         """ポジション更新"""
         try:
             # APIからポジション情報取得（実装予定）
-            if self.config.api_key and not self.config.enable_paper_trading:
+            if self.config.api_key:
                 # 実際のAPI呼び出し
                 # positions = await self.get_positions_from_api()
                 # self.positions.update(positions)
@@ -412,7 +386,6 @@ class SherrinfordBot:
                 "ボット開始", 
                 f"Sherrinford Bot が開始されました\n"
                 f"Environment: {ENVIRONMENT}\n"
-                f"Paper Trading: {self.config.enable_paper_trading}\n"
                 f"Mainnet: {self.config.is_mainnet}"
             )
             
@@ -471,12 +444,10 @@ class SherrinfordBot:
         if not self.config.api_key and ENVIRONMENT == "production":
             self.logger.warning("⚠️ API_KEY が本番環境で未設定")
         
-        if not self.config.private_key and not self.config.enable_paper_trading:
-            self.logger.warning("⚠️ PRIVATE_KEY が未設定（Paper Tradingが無効）")
+        if not self.config.private_key:
+            self.logger.warning("⚠️ PRIVATE_KEY が未設定")
         
         # 環境固有チェック
-        if ENVIRONMENT == "production" and self.config.enable_paper_trading:
-            self.logger.warning("⚠️ 本番環境でPaper Tradingが有効")
         
         if ENVIRONMENT == "development" and self.config.is_mainnet:
             self.logger.warning("⚠️ 開発環境でMainnetが有効")
@@ -542,7 +513,6 @@ class SherrinfordBot:
 async def main():
     """メイン関数"""
     print(f"🚀 Sherrinford Bot 起動 (Environment: {ENVIRONMENT})")
-    print(f"🧪 Paper Trading: {ENABLE_PAPER_TRADING}")
     print(f"🔗 Mainnet: {IS_MAINNET}")
     
     try:
