@@ -15,7 +15,7 @@ jobs:
           python-version: '3.12'
       - run: pip install --upgrade pip
       - run: pip install -e .
-      - run: pip install flake8 mypy pytest
+      - run: pip install flake8 mypy pytest types-PyYAML
       - run: flake8 bots shared --count --statistics
       - run: |
           mkdir -p /tmp/mypy_check
