@@ -1,44 +1,57 @@
-"""Database management for trading bots"""
-import asyncio
-import logging
-from typing import Dict, Any, Optional
+import aiosqlite
 import os
-from datetime import datetime
+import logging
+from pathlib import Path
+from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
 class DatabaseManager:
-    """Manages database connections and operations"""
-
     def __init__(self):
-        self.pool: Optional[Any] = None
-        self.host = os.getenv("DB_HOST", "localhost")
-        self.port = int(os.getenv("DB_PORT", "5432"))
-        self.database = os.getenv("DB_NAME", "trading_dev")
-        self.user = os.getenv("DB_USER", "trader")
-        self.password = os.getenv("DB_PASSWORD")
-
+        self.db_path = os.getenv("SQLITE_PATH", "/data/bot.db")
+        self.connection: Optional[aiosqlite.Connection] = None
+    
     async def connect(self) -> None:
-        """Establish database connection pool"""
-        try:
-            logger.info("🗄️ Database connection established")
-        except Exception as e:
-            logger.error(f"Failed to connect to database: {e}")
-            raise
-
+        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+        self.connection = await aiosqlite.connect(self.db_path)
+        await self._create_tables()
+        logger.info(f"🗄️ SQLite connected: {self.db_path}")
+    
+    async def _create_tables(self) -> None:
+        await self.connection.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol TEXT NOT NULL,
+                side TEXT NOT NULL,
+                quantity REAL NOT NULL,
+                price REAL NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                environment TEXT,
+                signature TEXT
+            )
+        """)
+        await self.connection.commit()
+    
     async def close(self) -> None:
-        """Close database connection pool"""
-        if self.pool:
-            logger.info("🗄️ Database connection closed")
-
+        if self.connection:
+            await self.connection.close()
+            logger.info("🗄️ SQLite connection closed")
+    
     async def log_order(self, order_data: Dict[str, Any]) -> None:
-        """Log order to database"""
-        if not self.pool:
-            logger.warning("Database not connected, logging to console")
-            logger.info(f"📝 Order: {order_data}")
+        if not self.connection:
+            logger.warning("Database not connected")
             return
-
-        try:
-            logger.info(f"📝 Order logged: {order_data}")
-        except Exception as e:
-            logger.error(f"Failed to log order to database: {e}")
+        
+        await self.connection.execute("""
+            INSERT INTO orders (symbol, side, quantity, price, environment, signature)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            order_data.get("symbol"),
+            order_data.get("side"), 
+            order_data.get("quantity"),
+            order_data.get("price"),
+            order_data.get("environment"),
+            order_data.get("signature")
+        ))
+        await self.connection.commit()
+        logger.info(f"📝 Order logged to SQLite: {order_data}")
