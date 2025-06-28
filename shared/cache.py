@@ -27,6 +27,6 @@ class SimpleCache:
     async def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
         """Set value in cache with TTL"""
         self._cache[key] = value
-        expire_time = (asyncio.get_event_loop().time() + 
-                      (ttl or self.default_ttl))
+        expire_time = (asyncio.get_event_loop().time() +
+                       (ttl or self.default_ttl))
         self._ttl[key] = expire_time
