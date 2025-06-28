@@ -38,6 +38,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
+      - run: docker build -f docker/base.Dockerfile -t root-bot-base:latest .
       - run: |
           docker build -f bots/${{ matrix.bot }}/Dockerfile \
             -t ghcr.io/${{ github.repository }}/${{ matrix.bot }}:${{ github.sha }} .
