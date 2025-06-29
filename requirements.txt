@@ -24,7 +24,7 @@ mypy>=1.10.0
 typing-extensions>=4.0.0
 typing-inspect>=0.8.0
 
-mypy-extensions==1.0.0
+mypy-extensions==1.1.0
 
 # [conda-forge] 数値計算（condaでの高速化推奨）
 # pandas>=2.0.0
