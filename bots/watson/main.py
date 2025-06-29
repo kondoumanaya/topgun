@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 import yaml
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 
 ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
@@ -25,35 +25,44 @@ try:
 except ImportError:
     _SHARED_MODULES_AVAILABLE = False
 
-    def setup_logger(name: str) -> logging.Logger:
+    def setup_logger(bot: str) -> logging.Logger:
         logging.basicConfig(level=logging.INFO)
-        return logging.getLogger(name)
+        return logging.getLogger(bot)
 
     class _FallbackNotificationManager:
+
         async def send_notification(self, title: str, message: str) -> None:
             print(f"📱 {title}: {message}")
+
         async def send_alert(self, message: str) -> None:
             print(f"🚨 ALERT: {message}")
 
     class _FallbackDatabaseManager:
+
         async def connect(self) -> None:
             pass
+
         async def close(self) -> None:
             pass
+
         async def log_order(self, order_data: dict) -> None:
             print(f"📝 Order: {order_data}")
 
     class _FallbackMetricsCollector:
+
         def __init__(self, name: str):
             self.name = name
+
         def increment_counter(self, name: str, value: int = 1) -> None:
             print(f"📊 Counter {self.name}.{name}: +{value}")
+
         def gauge(self, name: str, value: float) -> None:
             print(f"📊 Gauge {self.name}.{name}: {value}")
 
     NotificationManager = _FallbackNotificationManager  # type: ignore
     DatabaseManager = _FallbackDatabaseManager  # type: ignore
     MetricsCollector = _FallbackMetricsCollector  # type: ignore
+
 
 @dataclass
 class WatsonConfig:
@@ -66,6 +75,7 @@ class WatsonConfig:
     position_size: float = 0.1
     stop_loss_pct: float = 0.05
     take_profit_pct: float = 0.15
+
 
 class WatsonBot:
     """Watson Trend Following Bot"""
@@ -156,6 +166,7 @@ class WatsonBot:
         self.is_running = False
         await self.db.close()
         self.logger.info("Watson Bot stopped")
+
 
 async def main() -> None:
     """Main entry point"""
