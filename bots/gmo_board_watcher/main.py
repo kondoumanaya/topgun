@@ -15,7 +15,8 @@ from typing import Any
 import aiohttp
 
 logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.WARNING,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -35,7 +36,8 @@ class GMOBoardWatcher:
         self.session = aiohttp.ClientSession()
 
         try:
-            self.ws = await self.session.ws_connect("wss://api.coin.z.com/ws/public/v1")
+            self.ws = await self.session.ws_connect(
+                "wss://api.coin.z.com/ws/public/v1")
 
             subscribe_msg = {
                 "command": "subscribe",
@@ -45,7 +47,8 @@ class GMOBoardWatcher:
             await self.ws.send_str(json.dumps(subscribe_msg))
 
             self.running = True
-            logger.info(f"Started watching GMO Coin board data for {self.symbol}")
+            logger.info(
+                f"Started watching GMO Coin board data for {self.symbol}")
 
             async for msg in self.ws:
                 if msg.type == aiohttp.WSMsgType.TEXT:
@@ -69,7 +72,8 @@ class GMOBoardWatcher:
 
     async def _handle_message(self, data: dict[str, Any]) -> None:
         """Handle incoming WebSocket message"""
-        if data.get("channel") == "orderbooks" and data.get("symbol") == self.symbol:
+        if (data.get("channel") == "orderbooks" and
+                data.get("symbol") == self.symbol):
             asks = data.get("asks", [])[:5]  # Top 5 asks
             bids = data.get("bids", [])[:5]  # Top 5 bids
             timestamp = data.get("timestamp", "N/A")

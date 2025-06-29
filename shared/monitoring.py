@@ -5,6 +5,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
+
 class MetricsCollector:
     """Collects and manages bot metrics"""
 
@@ -36,12 +37,3 @@ class MetricsCollector:
         """Reset all counters"""
         self.counters.clear()
         logger.info(f"📊 Reset counters for {self.name}")
-
-    def export_prometheus(self) -> str:
-        """Export metrics in Prometheus format"""
-        lines: list[str] = []
-        for name, counter_value in self.counters.items():
-            lines.append(f"{self.name}_{name}_total {counter_value}")
-        for name, gauge_value in self.gauges.items():
-            lines.append(f"{self.name}_{name} {gauge_value}")
-        return "\n".join(lines)
