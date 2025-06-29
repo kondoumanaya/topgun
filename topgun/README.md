@@ -54,14 +54,12 @@ It has the following features, making it useful for developing a trading bot.
 
 ## 🐍 Requires
 
-Python 3.9+
+Python 3.12+
 
 ## 🔧 Installation
 
-From [PyPI](https://pypi.org/project/topgun/) (stable version):
-
 ```sh
-pip install topgun
+pip install -e topgun
 ```
 
 From [GitHub](https://github.com/topgun/topgun) (latest version):
@@ -69,10 +67,6 @@ From [GitHub](https://github.com/topgun/topgun) (latest version):
 ```sh
 pip install git+https://github.com/topgun/topgun.git
 ```
-
-## ⚠️ Compatibility warning
-
-topgun is planning a completely new code base v2. It is recommended to specify version less than 2.0 (`topgun<2.0`) when specifying it as a dependency.
 
 > [!IMPORTANT]
 > The roadmap is here: [topgun/topgun#248](https://github.com/topgun/topgun/issues/248)
