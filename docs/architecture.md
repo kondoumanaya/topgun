@@ -1,8 +1,8 @@
-# Root-Bot Architecture Overview
+# Root-Botアーキテクチャ概要
 
-## System Design
+## システム設計
 
-Root-Bot implements a modular trading bot architecture with complete separation between bots, lightweight Docker containers, and automated CI/CD deployment.
+Root-Botは、ボット間の完全分離、軽量Dockerコンテナ、自動化CI/CDデプロイを備えたモジュラー取引ボットアーキテクチャを実装しています。
 
 ```
 ┌───────────── root-bot / docker network ─────────────┐
@@ -20,44 +20,44 @@ Root-Bot implements a modular trading bot architecture with complete separation 
 └─────────────────────────────────────────────────────┘
 ```
 
-## Key Components
+## 主要コンポーネント
 
-### Database Layer
-- **SQLite per-bot**: Each bot maintains isolated `/data/<bot>.db` files
-- **aiosqlite**: Async database operations for high performance
-- **Zero shared state**: Complete isolation prevents data conflicts
+### データベース層
+- **ボット別SQLite**: 各ボットが分離された`/data/<bot>.db`ファイルを維持
+- **aiosqlite**: 高性能な非同期データベース操作
+- **共有状態ゼロ**: 完全分離によりデータ競合を防止
 
-### Caching Layer (Optional)
-- **Redis per-bot**: Optional Redis instances with separate passwords/DB numbers
-- **Configurable**: Bots can disable Redis via `USE_REDIS=false`
+### キャッシュ層（オプション）
+- **ボット別Redis**: 別々のパスワード/DB番号を持つオプションRedisインスタンス
+- **設定可能**: ボットは`USE_REDIS=false`でRedisを無効化可能
 
-### Logging System
-- **QueueHandler**: Non-blocking I/O using separate thread
-- **RotatingFileHandler**: Automatic log rotation (1MB, 3 backups)
-- **Per-bot logs**: Isolated log files in `/app/logs/<bot>.log`
+### ログシステム
+- **QueueHandler**: 別スレッドを使用したノンブロッキングI/O
+- **RotatingFileHandler**: 自動ログローテーション（1MB、3バックアップ）
+- **ボット別ログ**: `/app/logs/<bot>.log`の分離されたログファイル
 
-### Notification System
-- **Discord only**: Single webhook for weekly profit reports
-- **Scheduled**: Monday 00:00 JST (Sunday 15:00 UTC)
-- **Format**: `📈 **{bot}** week P/L: +5,000 JPY`
+### 通知システム
+- **Discord専用**: 週次利益レポート用の単一webhook
+- **スケジュール**: 月曜日00:00 JST（日曜日15:00 UTC）
+- **フォーマット**: `📈 **{bot}** week P/L: +5,000 JPY`
 
-### CI/CD Pipeline
+### CI/CDパイプライン
 ```
 GitHub Push → Lint/Test → Docker Build → GHCR Push → SSH Deploy
 ```
 
-## Scaling Strategy
+## スケーリング戦略
 
-Adding new bots:
-1. Copy `bots/template_bot/` → `bots/new_bot/`
-2. Update `docker-compose.prod.yml` with new service
-3. Add bot to CI matrix in `.github/workflows/ci.yml`
-4. Configure environment in `env/new_bot.env`
-5. Push → Automatic build and deployment
+新しいボットの追加:
+1. `bots/template_bot/` → `bots/new_bot/`をコピー
+2. `docker-compose.prod.yml`に新しいサービスを更新
+3. `.github/workflows/ci.yml`のCIマトリックスにボットを追加
+4. `env/new_bot.env`で環境を設定
+5. Push → 自動ビルドとデプロイ
 
-## Security Model
+## セキュリティモデル
 
-- **GitHub Secrets**: All sensitive data in encrypted secrets
-- **Environment isolation**: Each bot has separate `.env` files
-- **No shared credentials**: API keys, Redis passwords isolated per bot
-- **SSH deployment**: Secure automated deployment via SSH keys
+- **GitHub Secrets**: すべての機密データを暗号化されたシークレットに保存
+- **環境分離**: 各ボットが別々の`.env`ファイルを持つ
+- **共有認証情報なし**: APIキー、Redisパスワードをボット別に分離
+- **SSHデプロイ**: SSHキーによる安全な自動デプロイ

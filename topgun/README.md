@@ -8,84 +8,84 @@
 
 ![topgun logo](https://raw.githubusercontent.com/topgun/topgun/main/docs/logo_150.png)
 
-An advanced API client for python botters. This project is in Japanese.
+Python botters向けの高度なAPIクライアント。このプロジェクトは日本語対応です。
 
-## 📌 Description
+## 📌 概要
 
-`topgun` is a Python library for [仮想通貨 botter (crypto bot traders)](https://medium.com/perpdex/botter-the-crypto-bot-trader-in-japan-2f5f2a65856f).
+`topgun`は[仮想通貨 botter (crypto bot traders)](https://medium.com/perpdex/botter-the-crypto-bot-trader-in-japan-2f5f2a65856f)向けのPythonライブラリです。
 
-This library is an **HTTP and WebSocket API client**.
-It has the following features, making it useful for developing a trading bot.
+このライブラリは**HTTPおよびWebSocket APIクライアント**です。
+取引ボットの開発に役立つ以下の機能を備えています。
 
-## 🚀 Features
+## 🚀 機能
 
-- ✨ HTTP / WebSocket Client
-  - **Automatic authentication** for private APIs.
-  - WebSocket **automatic reconnection** and **automatic heartbeat**.
-  - A client based on [`aiohttp`](https://docs.aiohttp.org/).
+- ✨ HTTP / WebSocket クライアント
+  - プライベートAPIの**自動認証**
+  - WebSocketの**自動再接続**と**自動ハートビート**
+  - [`aiohttp`](https://docs.aiohttp.org/)ベースのクライアント
 - ✨ DataStore
-  - WebSocket message data handler.
-  - **Processing of differential data** such as order book updates
-  - **High-speed data processing** and querying
-- ✨ Other Experiences
-  - Support for type hints.
-  - Asynchronous programming using [`asyncio`](https://docs.python.org/ja/3/library/asyncio.html).
-  - Discord community.
+  - WebSocketメッセージデータハンドラー
+  - 板情報更新などの**差分データ処理**
+  - **高速データ処理**とクエリ
+- ✨ その他の機能
+  - 型ヒントのサポート
+  - [`asyncio`](https://docs.python.org/ja/3/library/asyncio.html)を使用した非同期プログラミング
+  - Discordコミュニティ
 
-## 🏦 Exchanges
+## 🏦 対応取引所
 
-| Name        | API auth | DataStore  | Exchange API docs                                                           |
+| 取引所名     | API認証  | DataStore  | 取引所API文書                                                               |
 | ----------- | -------- | ---------- | --------------------------------------------------------------------------- |
 | bitFlyer    | ✅       | ✅         | [Link](https://lightning.bitflyer.com/docs)                                 |
 | GMO Coin    | ✅       | ✅         | [Link](https://api.coin.z.com/docs/)                                        |
 | bitbank     | ✅       | ✅         | [Link](https://github.com/bitbankinc/bitbank-api-docs)                      |
 | Coincheck   | ✅       | ✅         | [Link](https://coincheck.com/ja/documents/exchange/api)                     |
-| OKJ         | ✅       | Not yet    | [Link](https://dev.okcoin.jp/en/)                                           |
-| BitTrade    | ✅       | Not yet    | [Link](https://api-doc.bittrade.co.jp/)                                     |
+| OKJ         | ✅       | 未対応     | [Link](https://dev.okcoin.jp/en/)                                           |
+| BitTrade    | ✅       | 未対応     | [Link](https://api-doc.bittrade.co.jp/)                                     |
 | Bybit       | ✅       | ✅         | [Link](https://bybit-exchange.github.io/docs/v5/intro)                      |
 | Binance     | ✅       | ✅         | [Link](https://developers.binance.com/docs/binance-spot-api-docs/CHANGELOG) |
 | OKX         | ✅       | ✅         | [Link](https://www.okx.com/docs-v5/en/)                                     |
 | Phemex      | ✅       | ✅         | [Link](https://phemex-docs.github.io/)                                      |
 | Bitget      | ✅       | ✅         | [Link](https://www.bitget.com/api-doc/common/intro)                         |
-| MEXC        | ✅       | No support | [Link](https://mexcdevelop.github.io/apidocs/spot_v3_en/)                   |
+| MEXC        | ✅       | 未対応     | [Link](https://mexcdevelop.github.io/apidocs/spot_v3_en/)                   |
 | KuCoin      | ✅       | ✅         | [Link](https://www.kucoin.com/docs/beginners/introduction)                  |
 | BitMEX      | ✅       | ✅         | [Link](https://www.bitmex.com/app/apiOverview)                              |
-| Hyperliquid | ✅       | Partially  | [Link](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api)  |
+| Hyperliquid | ✅       | 部分対応   | [Link](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api)  |
 
-## 🐍 Requires
+## 🐍 必要環境
 
 Python 3.9+
 
-## 🔧 Installation
+## 🔧 インストール
 
-From [PyPI](https://pypi.org/project/topgun/) (stable version):
+[PyPI](https://pypi.org/project/topgun/)から（安定版）:
 
 ```sh
 pip install topgun
 ```
 
-From [GitHub](https://github.com/topgun/topgun) (latest version):
+[GitHub](https://github.com/topgun/topgun)から（最新版）:
 
 ```sh
 pip install git+https://github.com/topgun/topgun.git
 ```
 
-## ⚠️ Compatibility warning
+## ⚠️ 互換性に関する注意
 
-topgun is planning a completely new code base v2. It is recommended to specify version less than 2.0 (`topgun<2.0`) when specifying it as a dependency.
+topgunは完全に新しいコードベースv2を計画しています。依存関係として指定する際は、2.0未満のバージョン（`topgun<2.0`）を指定することを推奨します。
 
 > [!IMPORTANT]
-> The roadmap is here: [topgun/topgun#248](https://github.com/topgun/topgun/issues/248)
+> ロードマップはこちら: [topgun/topgun#248](https://github.com/topgun/topgun/issues/248)
 
-## 📝 Usage
+## 📝 使用方法
 
-Example of bitFlyer API:
+bitFlyer APIの例:
 
 ### HTTP API
 
-New interface from version 1.0: **Fetch API**.
+バージョン1.0からの新しいインターフェース: **Fetch API**。
 
-More simple request/response.
+よりシンプルなリクエスト/レスポンス。
 
 ```py
 import asyncio
@@ -101,14 +101,14 @@ async def main():
     async with topgun.Client(
         apis=apis, base_url="https://api.bitflyer.com"
     ) as client:
-        # Fetch balance
+        # 残高を取得
         r = await client.fetch("GET", "/v1/me/getbalance")
 
         print(r.response.status, r.response.reason, r.response.url)
         print(r.data)
 
-        # Create order
-        CREATE_ORDER = False  # Set to `True` if you are trying to create an order.
+        # 注文を作成
+        CREATE_ORDER = False  # 注文を作成する場合は`True`に設定
         if CREATE_ORDER:
             r = await client.fetch(
                 "POST",
@@ -128,7 +128,7 @@ async def main():
 asyncio.run(main())
 ```
 
-aiohttp-based API.
+aiohttpベースのAPI。
 
 ```python
 import asyncio
@@ -144,15 +144,15 @@ async def main():
     async with topgun.Client(
         apis=apis, base_url="https://api.bitflyer.com"
     ) as client:
-        # Fetch balance
+        # 残高を取得
         async with client.get("/v1/me/getbalance") as resp:
             data = await resp.json()
 
         print(resp.status, resp.reason)
         print(data)
 
-        # Create order
-        CREATE_ORDER = False  # Set to `True` if you are trying to create an order.
+        # 注文を作成
+        CREATE_ORDER = False  # 注文を作成する場合は`True`に設定
         if CREATE_ORDER:
             async with client.post(
                 "/v1/me/sendchildorder",
@@ -181,10 +181,10 @@ import topgun
 
 async def main():
     async with topgun.Client() as client:
-        # Create a Queue
+        # キューを作成
         wsqueue = topgun.WebSocketQueue()
 
-        # Connect to WebSocket and subscribe to Ticker
+        # WebSocketに接続してTickerを購読
         await client.ws_connect(
             "wss://ws.lightstream.bitflyer.com/json-rpc",
             send_json={
@@ -194,7 +194,7 @@ async def main():
             hdlr_json=wsqueue.onmessage,
         )
 
-        # Iterate message (Ctrl+C to break)
+        # メッセージを反復処理（Ctrl+Cで中断）
         async for msg in wsqueue:
             print(msg)
 
@@ -215,10 +215,10 @@ import topgun
 
 async def main():
     async with topgun.Client() as client:
-        # Create DataStore
+        # DataStoreを作成
         store = topgun.bitFlyerDataStore()
 
-        # Connect to WebSocket and subscribe to Board
+        # WebSocketに接続して板情報を購読
         await client.ws_connect(
             "wss://ws.lightstream.bitflyer.com/json-rpc",
             send_json=[
@@ -234,7 +234,7 @@ async def main():
             hdlr_json=store.onmessage,
         )
 
-        # Watch for the best prices on Board. (Ctrl+C to break)
+        # 板情報の最良価格を監視（Ctrl+Cで中断）
         with store.board.watch() as stream:
             async for change in stream:
                 board = store.board.sorted(limit=2)
@@ -247,6 +247,6 @@ except KeyboardInterrupt:
     pass
 ```
 
-## 📖 Documentation
+## 📖 ドキュメント
 
-🔗 https://topgun.readthedocs.io/ja/stable/ (Japanese)
+🔗 https://topgun.readthedocs.io/ja/stable/ (日本語)
