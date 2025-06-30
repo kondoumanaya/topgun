@@ -17,7 +17,7 @@
 root-bot/
 ├── env/
 │   ├── .env.example          # プレースホルダー値付きテンプレート
-│   ├── .env.local           # 開発用（Git除外）
+│   ├── .env.production      # 本番環境用（Git除外）
 │   ├── sherrinford.env      # 本番ボット設定（Git除外）
 │   ├── watson.env           # 本番ボット設定（Git除外）
 │   └── gmo_board_watcher.env # 本番ボット設定（Git除外）
@@ -25,40 +25,40 @@ root-bot/
     └── api_key_guide.md     # このファイル
 ```
 
-## 開発環境セットアップ
+## 本番環境セットアップ
 
 ### ステップ 1: テンプレートをコピー
 
 ```bash
 cd root-bot/
-cp env/.env.example env/.env.local
+cp env/.env.example env/.env.production
 ```
 
-### ステップ 2: 開発用の値を入力
+### ステップ 2: 本番用の値を入力
 
-`env/.env.local`を編集:
+`env/.env.production`を編集:
 
 ```bash
-# 取引APIキー（開発にはテストネット/サンドボックスキーを使用）
-API_KEY_BTC_JPY=your_development_api_key_here
-API_SECRET_BTC_JPY=your_development_secret_here
+# 取引APIキー（本番環境用）
+API_KEY_BTC_JPY=your_production_api_key_here
+API_SECRET_BTC_JPY=your_production_secret_here
 
 # データベース
-SQLITE_PATH=/data/dev_bot.db
+SQLITE_PATH=/data/bot.db
 
-# 通知（開発時はオプション）
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123456789/your_dev_webhook
+# 通知
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/123456789/your_production_webhook
 
 # Redis（オプション）
 USE_REDIS=true
-REDIS_PASSWORD=dev_redis_password
+REDIS_PASSWORD=production_redis_password
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_DB=0
 
 # 環境設定
-ENVIRONMENT=development
-BOT_NAME=dev_bot
+ENVIRONMENT=production
+BOT_NAME=production_bot
 ```
 
 ### ステップ 3: 設定をテスト
@@ -68,7 +68,7 @@ BOT_NAME=dev_bot
 python -c "
 import os
 from dotenv import load_dotenv
-load_dotenv('env/.env.local')
+load_dotenv('env/.env.production')
 print('API Key loaded:', bool(os.getenv('API_KEY_BTC_JPY')))
 print('Environment:', os.getenv('ENVIRONMENT'))
 "
@@ -217,7 +217,7 @@ curl -X POST "YOUR_WEBHOOK_URL" \
 
 ```bash
 # .gitignoreに追加（既に設定済み）
-env/.env.local
+env/.env.production
 env/*.env
 !env/.env.example
 
@@ -288,7 +288,7 @@ def validate_env(env_file):
     return True
 
 # すべての環境ファイルを検証
-for env_file in ['env/.env.local', 'env/sherrinford.env', 'env/watson.env']:
+for env_file in ['env/.env.production', 'env/sherrinford.env', 'env/watson.env']:
     if os.path.exists(env_file):
         validate_env(env_file)
 ```

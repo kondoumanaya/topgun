@@ -15,7 +15,11 @@ from datetime import datetime
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
+from shared.notifier import NotificationManager
+from shared.database import DatabaseManager
+from shared.monitoring import MetricsCollector
+from topgun.topgun.helpers.hyperliquid import construct_l1_action
+
 ROOT_DIR = Path(__file__).parent.parent.parent
 
 # Global variables - will be set by load_environment()
@@ -26,14 +30,13 @@ LOG_LEVEL: str = "INFO"
 MAX_POSITION_SIZE: float = 1.0
 RISK_LIMIT: float = 0.1
 
+
 def load_environment():
     print(f"📁 Project Root: {ROOT_DIR}")
 
     env_files = [
-        ROOT_DIR / '.env',
-        ROOT_DIR / f'config/{ENVIRONMENT}.env',
-        ROOT_DIR / '.env.local',
-        ROOT_DIR / '.env.production',
+        ROOT_DIR / 'env' / '.env.production',
+        ROOT_DIR / 'env' / '.env.example',
     ]
 
     for env_file in env_files:
@@ -48,12 +51,11 @@ def load_environment():
 
     API_KEY = os.getenv('API_KEY_BTC_JPY', '')
     PRIVATE_KEY = os.getenv('PRIVATE_KEY_BTC_JPY', '')
-    IS_MAINNET = os.getenv('IS_MAINNET', 'false').lower() == 'true'
+    IS_MAINNET = os.getenv('IS_MAINNET', 'true').lower() == 'true'
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
     MAX_POSITION_SIZE = float(os.getenv('MAX_POSITION_SIZE', '1.0'))
     RISK_LIMIT = float(os.getenv('RISK_LIMIT', '0.1'))
 
-    print(f"🌍 Environment: {ENVIRONMENT}")
     print(f"📊 Log Level: {LOG_LEVEL}")
     print(f"🔗 Mainnet: {IS_MAINNET}")
     print(f"🔑 API Key: {'設定済み' if API_KEY else '未設定'}")
@@ -61,56 +63,10 @@ def load_environment():
     print(f"🎯 Max Position Size: {MAX_POSITION_SIZE}")
     print(f"⚠️ Risk Limit: {RISK_LIMIT}")
 
+
 load_environment()
 
 sys.path.insert(0, str(ROOT_DIR))
-
-try:
-    from shared.notifier import NotificationManager
-    from shared.database import DatabaseManager
-    from shared.monitoring import MetricsCollector
-    _SHARED_MODULES_AVAILABLE = True
-except ImportError:
-    print("⚠️ Shared libraries not available, using fallback implementations")
-    _SHARED_MODULES_AVAILABLE = False
-
-    class NotificationManager:  # type: ignore
-        async def send_notification(self, title: str, message: str) -> None:
-            print(f"📱 {title}: {message}")
-
-        async def send_alert(self, message: str) -> None:
-            print(f"🚨 ALERT: {message}")
-
-    class DatabaseManager:  # type: ignore
-        async def connect(self) -> None:
-            pass
-
-        async def close(self) -> None:
-            pass
-
-        async def log_order(self, order_data: dict) -> None:
-            print(f"📝 Order: {order_data}")
-
-    class MetricsCollector:  # type: ignore
-        def __init__(self, name: str):
-            self.name = name
-
-        def increment_counter(self, name: str, value: int = 1) -> None:
-            print(f"📊 Counter {self.name}.{name}: +{value}")
-
-        def gauge(self, name: str, value: float) -> None:
-            print(f"📊 Gauge {self.name}.{name}: {value}")
-
-try:
-    from topgun.topgun.helpers.hyperliquid import construct_l1_action
-    _TOPGUN_AVAILABLE = True
-except ImportError:
-    print("⚠️ Topgun library not available")
-    _TOPGUN_AVAILABLE = False
-
-    def construct_l1_action(*args, **kwargs) -> dict:  # type: ignore
-        return {"action": "mock"}
-
 
 def sign_l1_action(*args, **kwargs) -> dict:  # type: ignore
     return {"signature": "mock"}
@@ -122,18 +78,16 @@ def post_request(*args, **kwargs) -> dict:  # type: ignore
 
 def setup_logger(name: str = "sherrinford") -> logging.Logger:
     """Setup logger with proper configuration"""
-    if _SHARED_MODULES_AVAILABLE:
-        try:
-            from shared.logger import setup_logger as shared_setup_logger
-            return shared_setup_logger(name)
-        except ImportError:
-            pass
-    logging.basicConfig(
-        level=getattr(logging, LOG_LEVEL),
-        format='%(asctime)s - %(name)s - %(levelname)s - '
-               '%(funcName)s:%(lineno)d - %(message)s'
-    )
-    return logging.getLogger(name)
+    try:
+        from shared.logger import setup_logger as shared_setup_logger
+        return shared_setup_logger(name)
+    except ImportError:
+        logging.basicConfig(
+            level=getattr(logging, LOG_LEVEL),
+            format='%(asctime)s - %(name)s - %(levelname)s - '
+                   '%(funcName)s:%(lineno)d - %(message)s'
+        )
+        return logging.getLogger(name)
 
 @dataclass
 class BotConfig:
@@ -151,6 +105,7 @@ class BotConfig:
 
         if not self.api_key or not self.private_key:
             raise ValueError("API key and private key are required")
+
 
 class SherrinfordBot:
     """Sherrinford Trading Bot - Production Implementation"""
@@ -172,7 +127,6 @@ class SherrinfordBot:
         signal.signal(signal.SIGTERM, self._signal_handler)
 
         self.logger.info("🚀 Sherrinford Bot initialized")
-        self.logger.info(f"   Environment: {ENVIRONMENT}")
         self.logger.info(f"   is_mainnet: {config.is_mainnet}")
         self.logger.info(f"   max_position_size: {config.max_position_size}")
         self.logger.info(f"   risk_limit: {config.risk_limit}")
@@ -276,6 +230,7 @@ class SherrinfordBot:
         except Exception as e:
             self.logger.error(f"💥 Risk check error: {e}")
             return False
+
     async def update_positions(self) -> None:
         """Update position tracking"""
         try:
@@ -312,7 +267,6 @@ class SherrinfordBot:
             await self.notifier.send_notification(
                 "Bot Started",
                 f"Sherrinford Bot started\n"
-                f"Environment: {ENVIRONMENT}\n"
                 f"Mainnet: {self.config.is_mainnet}")
 
             await self._initial_checks()
@@ -329,7 +283,7 @@ class SherrinfordBot:
 
                     await self.execute_trading_logic()
 
-                    if ENVIRONMENT == "development" and loop_count % 60 == 0:
+                    if loop_count % 60 == 0:
                         self.logger.info(f"🔄 Main loop running: {loop_count}")
                         self.logger.info(
                             f"📊 Stats: {self.order_count} orders, "
@@ -387,7 +341,6 @@ class SherrinfordBot:
             await self.notifier.send_notification(
                 "Bot Stopped",
                 f"Sherrinford Bot stopped\n"
-                f"Environment: {ENVIRONMENT}\n"
                 f"Orders: {self.order_count}\n"
                 f"Errors: {self.error_count}")
 
