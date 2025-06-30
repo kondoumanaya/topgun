@@ -72,7 +72,6 @@ config/production.*
 config/staging.*
 *.env.production
 *.env.staging
-*.env.local
 
 # 不要なDocker関連
 docker-compose*.yml

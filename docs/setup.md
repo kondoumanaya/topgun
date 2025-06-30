@@ -23,21 +23,16 @@ pip install -e ./topgun
 
 # プロジェクト共通依存関係
 pip install -r requirements.txt
-
-# 開発用依存関係
-pip install -r requirements/test.txt
-pip install -r requirements/typing.txt
 ```
 
 ### 3. 環境設定
 
 ```bash
 # 環境変数設定
-cp env/.env.example env/.env
-cp env/.env.example env/.env.local
+cp env/.env.example env/.env.production
 
 # APIキーなどの秘密情報を設定
-vim env/.env.local
+vim env/.env.production
 ```
 
 #### 環境変数管理の詳細
@@ -45,16 +40,12 @@ vim env/.env.local
 **ファイル構成と役割**:
 
 - `env/.env.example`: 設定テンプレート（Git 管理対象）
-- `env/.env`: 基本設定（Git 管理対象）
-- `env/.env.local`: ローカル開発用（Git 管理対象外）
 - `env/.env.production`: 本番環境用（Git 管理対象外）
 
 **読み込み優先順位**:
 
-1. `.env.local` (最優先)
-2. `.env`
-3. `.env.production`
-4. `.env.example`
+1. `.env.production` (最優先)
+2. `.env.example`
 
 **各ボットでの使用方法**:
 
@@ -63,21 +54,18 @@ from dotenv import load_dotenv
 import os
 
 # 環境変数を明示的にロード
-load_dotenv("env/.env.local")
-load_dotenv("env/.env")
+load_dotenv("env/.env.production")
+load_dotenv("env/.env.example")
 
 # APIキーの取得
 api_key = os.getenv("GMO_API_KEY")
 ```
 
-### 4. データベース設定（Docker 使用時）
+### 4. 本番環境起動
 
 ```bash
-# 開発環境起動
-docker-compose -f docker/docker-compose.yml up postgres redis -d
-
-# データベース初期化
-# （必要に応じてマイグレーション実行）
+# 起動
+docker-compose up -d
 ```
 
 ## 各ボットの個別セットアップ
@@ -121,19 +109,7 @@ vim config.yml
 python main.py
 ```
 
-## Docker 環境セットアップ
-
-### 開発環境
-
-```bash
-docker-compose -f docker/docker-compose.yml up
-```
-
-### テスト環境
-
-```bash
-docker-compose -f docker/docker-compose.test.yml up --profile test
-```
+## Docker 本番環境セットアップ
 
 ### 本番環境
 
@@ -143,7 +119,7 @@ cp env/.env.example env/.env.production
 vim env/.env.production
 
 # 本番環境起動
-docker-compose -f docker/docker-compose.prod.yml up -d
+docker-compose up -d
 ```
 
 ## shared/ ディレクトリの活用
