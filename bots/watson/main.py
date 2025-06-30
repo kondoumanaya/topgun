@@ -16,52 +16,10 @@ from datetime import datetime
 ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-try:
-    from shared.logger import setup_logger
-    from shared.notifier import NotificationManager
-    from shared.database import DatabaseManager
-    from shared.monitoring import MetricsCollector
-    _SHARED_MODULES_AVAILABLE = True
-except ImportError:
-    _SHARED_MODULES_AVAILABLE = False
-
-    def setup_logger(bot: str) -> logging.Logger:
-        logging.basicConfig(level=logging.INFO)
-        return logging.getLogger(bot)
-
-    class _FallbackNotificationManager:
-
-        async def send_notification(self, title: str, message: str) -> None:
-            print(f"📱 {title}: {message}")
-
-        async def send_alert(self, message: str) -> None:
-            print(f"🚨 ALERT: {message}")
-
-    class _FallbackDatabaseManager:
-
-        async def connect(self) -> None:
-            pass
-
-        async def close(self) -> None:
-            pass
-
-        async def log_order(self, order_data: dict) -> None:
-            print(f"📝 Order: {order_data}")
-
-    class _FallbackMetricsCollector:
-
-        def __init__(self, name: str):
-            self.name = name
-
-        def increment_counter(self, name: str, value: int = 1) -> None:
-            print(f"📊 Counter {self.name}.{name}: +{value}")
-
-        def gauge(self, name: str, value: float) -> None:
-            print(f"📊 Gauge {self.name}.{name}: {value}")
-
-    NotificationManager = _FallbackNotificationManager  # type: ignore
-    DatabaseManager = _FallbackDatabaseManager  # type: ignore
-    MetricsCollector = _FallbackMetricsCollector  # type: ignore
+from shared.logger import setup_logger
+from shared.notifier import NotificationManager
+from shared.database import DatabaseManager
+from shared.monitoring import MetricsCollector
 
 
 @dataclass

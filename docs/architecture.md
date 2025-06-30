@@ -56,7 +56,7 @@ GitHub Push → Lint/Test → Docker Build → GHCR Push → SSH Deploy
 新しいボットの追加:
 
 1. `bots/template_bot/` → `bots/new_bot/`をコピー
-2. `docker-compose.prod.yml`に新しいサービスを更新
+2. `docker-compose.yml`に新しいサービスを更新
 3. `.github/workflows/ci.yml`の CI マトリックスにボットを追加
 4. `env/new_bot.env`で環境を設定
 5. Push → 自動ビルドとデプロイ

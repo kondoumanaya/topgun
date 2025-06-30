@@ -17,7 +17,6 @@ redis:
   max_connections: 50
 
 trading:
-  paper_trading: false
   position_size: 1.0
   risk_limit: 0.02
 

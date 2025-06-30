@@ -1,5 +1,4 @@
 ├── .env.example
-├── .env.local
 ├── .env.production
 ├── .gitattributes
 ├── .github
@@ -44,8 +43,6 @@
 ├── docker
     ├── .dockerignore
     ├── base.Dockerfile
-    ├── docker-compose.prod.yml
-    ├── docker-compose.test.yml
     └── docker-compose.yml
 ├── docs
     ├── api.md
