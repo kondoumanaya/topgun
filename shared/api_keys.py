@@ -15,8 +15,6 @@ class APIKeyManager:
     """APIキー管理クラス"""
 
     def __init__(self):
-        load_dotenv("env/.env.local")
-        load_dotenv("env/.env")
         load_dotenv("env/.env.production")
         load_dotenv("env/.env.example")
 
@@ -75,5 +73,6 @@ class APIKeyManager:
             return False
 
         return True
+
 
 api_keys = APIKeyManager()

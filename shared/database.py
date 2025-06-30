@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseManager:
     def __init__(self):
         self.db_path = os.getenv("SQLITE_PATH", "/data/bot.db")
@@ -29,7 +30,6 @@ class DatabaseManager:
                 quantity REAL NOT NULL,
                 price REAL NOT NULL,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                environment TEXT,
                 signature TEXT
             )
         """)
@@ -46,15 +46,13 @@ class DatabaseManager:
             return
 
         await self.connection.execute("""
-            INSERT INTO orders (symbol, side, quantity, price, environment,
-                            signature)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO orders (symbol, side, quantity, price, signature)
+            VALUES (?, ?, ?, ?, ?)
         """, (
             order_data.get("symbol"),
             order_data.get("side"),
             order_data.get("quantity"),
             order_data.get("price"),
-            order_data.get("environment"),
             order_data.get("signature")
         ))
         await self.connection.commit()

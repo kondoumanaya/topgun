@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class NotificationManager:
     def __init__(self):
         self.discord_webhook = os.getenv("DISCORD_WEBHOOK_URL")

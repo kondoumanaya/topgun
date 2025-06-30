@@ -22,8 +22,7 @@ root-bot/
 │   └── tests/               # tests
 ├── docker/                  # Container configurations
 │   ├── base.Dockerfile      # Lightweight Python 3.12-slim base
-│   ├── docker-compose.yml   # Development environment
-│   └── docker-compose.prod.yml # Production deployment
+│   └── docker-compose.yml   # Production deployment
 ├── env/                     # Environment configuration
 │   ├── .env.example         # Template with <FILL_ME> placeholders
 │   ├── sherrinford.env      # Production config (Git ignored)
@@ -49,28 +48,21 @@ pip install -e ./topgun
 pip install -r requirements.txt
 
 # Configure environment
-cp env/.env.example env/.env.local
-# Edit env/.env.local with your API keys (see docs/api_key_guide.md)
+cp env/.env.example env/.env.production
+# Edit env/.env.production with your API keys (see docs/api_key_guide.md)
 ```
 
-### 2. Docker Development
+### 2. Production Deployment
 
 ```bash
 # Build base image
 docker build -f docker/base.Dockerfile -t root-bot-base:latest .
 
 # Start all bots
-docker-compose -f docker/docker-compose.yml up
+docker-compose up -d
 
 # Start individual bot
-docker-compose -f docker/docker-compose.yml up sherrinford
-```
-
-### 3. Production Deployment
-
-```bash
-# Production environment (on server)
-docker-compose -f docker/docker-compose.prod.yml up -d
+docker-compose up sherrinford
 ```
 
 ## Key Features
@@ -114,18 +106,15 @@ docker-compose up watson
 docker-compose up gmo_board_watcher
 ```
 
-## Development Workflow
+## Production Workflow
 
 ### Code Quality
 
-````bash
+```bash
 # Lint and type checking
 flake8 bots shared
-mypy bots shared```
-
-# Run tests
-pytest topgun/tests/
-````
+mypy bots shared
+```
 
 ### Adding New Bots
 
