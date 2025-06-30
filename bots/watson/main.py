@@ -4,7 +4,6 @@ Watson Bot - Trend Following Trading Bot
 """
 
 import asyncio
-import logging
 import os
 import sys
 from pathlib import Path
@@ -13,13 +12,13 @@ import yaml
 from dataclasses import dataclass, field
 from datetime import datetime
 
-ROOT_DIR = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(ROOT_DIR))
-
 from shared.logger import setup_logger
 from shared.notifier import NotificationManager
 from shared.database import DatabaseManager
 from shared.monitoring import MetricsCollector
+
+ROOT_DIR = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 
 
 @dataclass

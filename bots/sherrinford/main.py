@@ -15,6 +15,11 @@ from datetime import datetime
 from dataclasses import dataclass
 from dotenv import load_dotenv
 
+from shared.notifier import NotificationManager
+from shared.database import DatabaseManager
+from shared.monitoring import MetricsCollector
+from topgun.topgun.helpers.hyperliquid import construct_l1_action
+
 ROOT_DIR = Path(__file__).parent.parent.parent
 
 # Global variables - will be set by load_environment()
@@ -24,6 +29,7 @@ IS_MAINNET: bool = False
 LOG_LEVEL: str = "INFO"
 MAX_POSITION_SIZE: float = 1.0
 RISK_LIMIT: float = 0.1
+
 
 def load_environment():
     print(f"📁 Project Root: {ROOT_DIR}")
@@ -57,14 +63,11 @@ def load_environment():
     print(f"🎯 Max Position Size: {MAX_POSITION_SIZE}")
     print(f"⚠️ Risk Limit: {RISK_LIMIT}")
 
+
 load_environment()
 
 sys.path.insert(0, str(ROOT_DIR))
 
-from shared.notifier import NotificationManager
-from shared.database import DatabaseManager
-from shared.monitoring import MetricsCollector
-from topgun.topgun.helpers.hyperliquid import construct_l1_action
 
 def sign_l1_action(*args, **kwargs) -> dict:  # type: ignore
     return {"signature": "mock"}
@@ -87,6 +90,7 @@ def setup_logger(name: str = "sherrinford") -> logging.Logger:
         )
         return logging.getLogger(name)
 
+
 @dataclass
 class BotConfig:
     """Bot configuration"""
@@ -103,6 +107,7 @@ class BotConfig:
 
         if not self.api_key or not self.private_key:
             raise ValueError("API key and private key are required")
+
 
 class SherrinfordBot:
     """Sherrinford Trading Bot - Production Implementation"""
@@ -227,6 +232,7 @@ class SherrinfordBot:
         except Exception as e:
             self.logger.error(f"💥 Risk check error: {e}")
             return False
+
     async def update_positions(self) -> None:
         """Update position tracking"""
         try:

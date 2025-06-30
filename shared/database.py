@@ -6,6 +6,7 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseManager:
     def __init__(self):
         self.db_path = os.getenv("SQLITE_PATH", "/data/bot.db")
