@@ -5,8 +5,8 @@ import logging
 from typing import TYPE_CHECKING, NoReturn
 
 if TYPE_CHECKING:
-    from topgun.client import Client
-    from topgun.ws import WebSocketApp
+    from topgun.topgun.client import Client
+    from topgun.topgun.ws import WebSocketApp
 
 logger = logging.getLogger(__name__)
 

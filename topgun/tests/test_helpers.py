@@ -14,7 +14,7 @@ from yarl import URL
 import topgun
 from topgun.helpers.bitbank import subscribe, subscribe_with_callback
 from topgun.helpers.gmocoin import GMOCoinHelper
-from topgun.request import ClientRequest
+from topgun.topgun.request import ClientRequest
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator

@@ -7,7 +7,7 @@ from decimal import Decimal
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, Awaitable, TypedDict, cast
 
-from topgun.auth import Auth
+from topgun.topgun.auth import Auth
 from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
