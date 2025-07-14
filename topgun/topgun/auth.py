@@ -15,7 +15,7 @@ from aiohttp.payload import JsonPayload
 from multidict import CIMultiDict, MultiDict
 from yarl import URL
 
-from topgun.helpers import hyperliquid
+from topgun.topgun.helpers import hyperliquid
 
 if TYPE_CHECKING:
     from collections.abc import Callable

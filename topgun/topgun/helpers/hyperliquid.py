@@ -40,13 +40,13 @@ import hashlib
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, TypedDict, cast
 
-from topgun._static_dependencies import keccak, msgpack
-from topgun._static_dependencies.ecdsa import SECP256k1, SigningKey
-from topgun._static_dependencies.ecdsa.util import (
+from topgun.topgun._static_dependencies import keccak, msgpack
+from topgun.topgun._static_dependencies.ecdsa import SECP256k1, SigningKey
+from topgun.topgun._static_dependencies.ecdsa.util import (
     sigencode_strings_canonize,
     string_to_number,
 )
-from topgun._static_dependencies.ethereum.account.messages import (
+from topgun.topgun._static_dependencies.ethereum.account.messages import (
     encode_typed_data,
 )
 
