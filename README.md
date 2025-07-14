@@ -1,181 +1,115 @@
-# Root-Bot Trading System
+# topgun
 
-Crypto trading bot project with shared topgun library.
+Common library for trading bot systems providing HTTP/WebSocket clients, authentication, and helper functions.
 
-## Architecture Overview
+## Installation
 
-```
-root-bot/
-├── bots/                    # Individual trading bots (completely isolated)
-│   ├── sherrinford/         # High-frequency scalping bot
-│   │   ├── main.py          # Bot implementation
-│   │   ├── Dockerfile       # Individual container
-│   │   └── requirements.txt # Bot-specific dependencies
-│   ├── watson/              # Trend following bot
-│   └── gmo_board_watcher/   # GMO order book monitoring
-├── shared/                  # Common libraries (lightweight)
-│   ├── logger.py            # QueueLogging for non-blocking I/O
-│   ├── database.py          # SQLite wrapper with aiosqlite
-│   ├── notifier.py          # Discord-only weekly profit reports
-│   └── redis_manager.py     # Optional Redis per-bot
-├── topgun/                  # Exchange API library (editable install)
-│   └── tests/               # tests
-├── docker/                  # Container configurations
-│   ├── base.Dockerfile      # Lightweight Python 3.12-slim base
-│   └── docker-compose.yml   # Production deployment
-├── env/                     # Environment configuration
-│   ├── .env.example         # Template with <FILL_ME> placeholders
-│   ├── sherrinford.env      # Production config (Git ignored)
-│   └── watson.env           # Production config (Git ignored)
-├── .github/workflows/       # CI/CD Pipeline
-│   └── ci.yml               # Lint → Test → Build → Deploy
-└── docs/                    # Documentation
-    ├── api_key_guide.md     # API key setup instructions
-    └── architecture.png     # System architecture diagram
-```
-
-## 環境構築
-
-### 1. 依存関係のインストール
+Install from GitHub repository with specific version:
 
 ```bash
-# Clone and setup
-git clone https://github.com/kondoumanaya/root-bot.git
-cd root-bot
-
-# Install dependencies
-pip install -e ./topgun
-pip install -r requirements.txt
-
-# Configure environment
-cp env/.env.example env/.env.production
-# Edit env/.env.production with your API keys (see docs/api_key_guide.md)
+pip install git+https://github.com/kondoumanaya/topgun.git@v0.1.0
 ```
 
-### 2. Production Deployment
+For latest development version:
 
 ```bash
-# Build base image
-docker build -f docker/base.Dockerfile -t root-bot-base:latest .
-
-# Start all bots
-docker-compose up -d
-
-# Start individual bot
-docker-compose up sherrinford
+pip install git+https://github.com/kondoumanaya/topgun.git
 ```
 
-## Key Features
+## Features
 
-### ✅ Complete Bot Isolation
+- ✨ **HTTP / WebSocket Client**
+  - Automatic authentication for private APIs
+  - WebSocket automatic reconnection and heartbeat
+  - Built on aiohttp for async operations
 
-- Each bot has its own SQLite database (`/data/<bot>.db`)
-- Optional Redis per bot with separate passwords and DB numbers
-- Individual Docker containers with isolated dependencies
-- No shared state between bots
+- ✨ **DataStore**
+  - WebSocket message data handler
+  - Processing of differential data (order book updates)
+  - Real-time data management
 
-### ✅ High-Performance Logging
+- ✨ **Helpers**
+  - Signing helpers for private APIs
+  - Hyperliquid EIP-712 signing support
+  - Authentication utilities
 
-- QueueLogging with background threads for non-blocking I/O
-- RotatingFileHandler (1MB max, 3 backups)
-- Trading loops never blocked by log writes
+## Usage
 
-### ✅ Discord-Only Notifications
+### Basic HTTP Client
 
-- Weekly profit reports every Monday 00:00 JST
-- Simple webhook integration
+```python
+import asyncio
+import topgun
 
-### ✅ Automated CI/CD
+async def main():
+    apis = {
+        "exchange": ["API_KEY", "API_SECRET"]
+    }
+    
+    async with topgun.Client(apis=apis) as client:
+        result = await client.fetch("GET", "/api/endpoint")
+        print(result.data)
 
-- GitHub Actions: Lint → Test → Build → Deploy
-- Parallel Docker builds for all bots
-- SSH deployment to production server
-- GHCR (GitHub Container Registry) for image storage
-
-## Individual Bot Execution
-
-```bash
-# Direct execution (development)
-cd bots/sherrinford && python main.py
-cd bots/watson && python main.py
-cd bots/gmo_board_watcher && python main.py
-
-# Docker execution (recommended)
-docker-compose up sherrinford
-docker-compose up watson
-docker-compose up gmo_board_watcher
+asyncio.run(main())
 ```
 
-## Production Workflow
+### WebSocket Connection
 
-### Code Quality
+```python
+import asyncio
+import topgun
 
-```bash
-# Lint and type checking
-flake8 bots shared
-mypy bots shared
+async def message_handler(message):
+    print(f"Received: {message}")
+
+async def main():
+    apis = {
+        "exchange": ["API_KEY", "API_SECRET"]
+    }
+    
+    async with topgun.Client(apis=apis) as client:
+        ws = client.ws_connect(
+            "wss://api.exchange.com/ws",
+            hdlr_json=message_handler
+        )
+        await ws.wait()
+
+asyncio.run(main())
 ```
 
-### Adding New Bots
+### Hyperliquid Signing Helper
 
-1. Copy template: `cp -r bots/template_bot bots/new_bot`
-2. Update `bots/new_bot/main.py` with trading logic
-3. Create `bots/new_bot/Dockerfile` following existing pattern
-4. Add service to `docker/docker-compose.yml`
-5. Create environment file: `env/new_bot.env`
-6. Update CI matrix in `.github/workflows/ci.yml`
+```python
+from topgun.topgun.helpers.hyperliquid import construct_l1_action
 
-### Database Management
+action = {
+    "type": "order",
+    "orders": [{
+        "a": 0,
+        "b": True,
+        "p": "50000",
+        "s": "0.001",
+        "r": False,
+        "t": {"limit": {"tif": "Gtc"}}
+    }]
+}
 
-- Each bot automatically creates its SQLite database on first run
-- Database path: `/data/<bot_name>.db` (configurable via `SQLITE_PATH`)
-- No migrations needed - tables created automatically
-- Backup: Simply copy the `.db` files
+domain_data, message_types, phantom_agent = construct_l1_action(
+    action, nonce=1234567890, is_mainnet=False
+)
+```
 
-### Redis Usage (Optional)
+## Version History
 
-- Set `USE_REDIS=true` in bot environment file
-- Configure `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
-- Each bot gets isolated Redis instance or DB number
+- **v0.1.0** - Initial release with HTTP/WebSocket client and Hyperliquid helpers
+- See [CHANGELOG.md](CHANGELOG.md) for detailed version history
 
-## Security & Configuration
+## Development
 
-### API Keys
+This library is designed to be used by multiple trading bot services. Each bot should depend on a specific tagged version for stability.
 
-- See [docs/api_key_guide.md](docs/api_key_guide.md) for detailed setup
-- Never commit actual keys to Git
-- Use `<FILL_ME>` placeholders in templates
-- Production keys stored outside Git repository
+For bot template and usage examples, see the [sherrinford template repository](https://github.com/kondoumanaya/sherrinford).
 
-### GitHub Secrets (for CI/CD)
+## License
 
-- `GHCR_TOKEN`: GitHub Container Registry access
-- `PROD_HOST`: Production server hostname
-- `PROD_USER`: SSH username for deployment
-- `PROD_KEY`: SSH private key for deployment
-
-## Architecture Benefits
-
-### Scalability
-
-- Add new bots without affecting existing ones
-- Deploy bots to different servers independently
-- Scale individual bots based on resource needs
-
-### Reliability
-
-- Bot failures don't affect other bots
-- Database corruption isolated to single bot
-- Independent restart and recovery
-
-### Maintainability
-
-- Clear separation of concerns
-- Minimal shared dependencies
-- Easy to debug and monitor individual bots
-
-### Performance
-
-- No database lock contention between bots
-- Non-blocking logging system
-- Lightweight containers with minimal overhead
+This project is licensed under the MIT License.
