@@ -61,6 +61,7 @@ dependencies = [
     # Time & Date
     "python-dateutil>=2.8.0",
     "pytz>=2023.3",
+]
 
 [project.urls]
 Homepage = "https://github.com/kondoumanaya/topgun"
