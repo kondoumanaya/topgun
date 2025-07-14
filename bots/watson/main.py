@@ -20,6 +20,7 @@ from shared.monitoring import MetricsCollector
 ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
+
 @dataclass
 class WatsonConfig:
     """Watson bot configuration"""

@@ -68,6 +68,7 @@ load_environment()
 
 sys.path.insert(0, str(ROOT_DIR))
 
+
 def sign_l1_action(*args, **kwargs) -> dict:  # type: ignore
     return {"signature": "mock"}
 
@@ -88,6 +89,7 @@ def setup_logger(name: str = "sherrinford") -> logging.Logger:
                    '%(funcName)s:%(lineno)d - %(message)s'
         )
         return logging.getLogger(name)
+
 
 @dataclass
 class BotConfig:
