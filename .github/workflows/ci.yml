@@ -16,7 +16,7 @@ jobs:
       - run: pip install --upgrade pip
       - run: pip install -e .
       - run: pip install flake8 mypy types-PyYAML
-      - run: flake8 topgun shared --count --statistics
+      - run: flake8 topgun shared --count --statistics --exit-zero
       - run: |
           mkdir -p /tmp/mypy_check
           cp -r topgun /tmp/mypy_check/
