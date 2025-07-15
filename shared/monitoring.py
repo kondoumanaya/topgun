@@ -1,4 +1,4 @@
-"""Monitoring and metrics collection for trading bots"""
+"""Monitoring and metrics collection for topgun library"""
 import logging
 from typing import Dict, Any
 import time

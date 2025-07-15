@@ -171,7 +171,7 @@ export PYTHONPATH=$(pwd):$PYTHONPATH
 
 ```bash
 # mypyの実行
-mypy bots/ shared/
+mypy topgun/ shared/
 
 # 型スタブの更新
 pip install --upgrade types-PyYAML types-requests

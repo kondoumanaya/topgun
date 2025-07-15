@@ -11,12 +11,6 @@
   },
 
   // Bot関連
-  {
-    "key": "cmd+shift+s",
-    "command": "workbench.action.tasks.runTask",
-    "args": "Start Bot - Sherrinford",
-    "when": "!terminalFocus"
-  },
 
   // Docker関連
   {

@@ -11,4 +11,4 @@ uv run \
     --with-editable ./topgun \
     --isolated \
     --no-project \
-    mypy bots/
+    mypy topgun/ shared/

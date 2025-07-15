@@ -46,17 +46,5 @@
       }
     },
 
-    {
-      "label": "Start Bot - Sherrinford",
-      "type": "shell",
-      "command": "conda activate root-bot && python bots/sherrinford/main.py",
-      "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": true,
-        "panel": "new"
-      }
-    }
   ]
 }

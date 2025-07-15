@@ -8,7 +8,7 @@ Root-Bot は、ボット間の完全分離、軽量 Docker コンテナ、自動
 ┌───────────── root-bot / docker network ─────────────┐
 │                                                     │
 │   ┌─────────────┐   ┌─────────────┐                 │
-│   │ Bot: sherr. │   │ Bot: watson │   … (scalable)  │
+│   │ Topgun Lib  │   │ Shared Utils│   … (modules)   │
 │   │  Python/top │   │  Python/top │                 │
 │   ├─────────────┤   ├─────────────┤                 │
 │   │ /data/*.db  │   │ /data/*.db  │  ← SQLite files │
@@ -53,12 +53,12 @@ GitHub Push → Lint/Test → Docker Build → GHCR Push → SSH Deploy
 
 ## スケーリング戦略
 
-新しいボットの追加:
+新しいボットプロジェクトの作成:
 
-1. `bots/template_bot/` → `bots/new_bot/`をコピー
-2. `docker-compose.yml`に新しいサービスを更新
-3. `.github/workflows/ci.yml`の CI マトリックスにボットを追加
-4. `env/new_bot.env`で環境を設定
+1. Sherrinfordテンプレートリポジトリを使用
+2. `requirements.txt`でtopgunライブラリを依存関係に追加
+3. 独立したCI/CDパイプラインを設定
+4. 環境変数で設定を管理
 5. Push → 自動ビルドとデプロイ
 
 ## セキュリティモデル

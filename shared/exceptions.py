@@ -1,4 +1,4 @@
-"""Custom exceptions for trading bots"""
+"""Custom exceptions for topgun library"""
 
 
 class TradingBotError(Exception):

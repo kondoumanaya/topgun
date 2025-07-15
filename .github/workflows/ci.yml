@@ -16,32 +16,18 @@ jobs:
       - run: pip install --upgrade pip
       - run: pip install -e .
       - run: pip install flake8 mypy types-PyYAML
-      - run: flake8 bots shared --count --statistics
+      - run: flake8 topgun shared --count --statistics
       - run: |
           mkdir -p /tmp/mypy_check
-          cp -r bots /tmp/mypy_check/
+          cp -r topgun /tmp/mypy_check/
           cp -r shared /tmp/mypy_check/
           cd /tmp/mypy_check
-          mypy bots shared --ignore-missing-imports --show-error-codes
+          mypy topgun shared --ignore-missing-imports --show-error-codes
 
   build-push:
+    if: false  # Disabled - no bots to build in topgun library
     needs: lint
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        bot: [sherrinford, watson, gmo_board_watcher]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-      - run: docker build -f docker/base.Dockerfile -t root-bot-base:latest .
-      - run: |
-          docker build -f bots/${{ matrix.bot }}/Dockerfile \
-            -t ghcr.io/${{ github.repository }}/${{ matrix.bot }}:${{ github.sha }} .
-          docker push ghcr.io/${{ github.repository }}/${{ matrix.bot }}:${{ github.sha }}
   deploy:
     if: false
     needs: build-push

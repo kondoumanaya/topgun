@@ -324,7 +324,7 @@ for env_file in ['env/.env.production', 'env/sherrinford.env', 'env/watson.env']
 追加のヘルプについて:
 
 1. [アーキテクチャガイド](architecture.md)を確認
-2. `bots/*/README.md`のボット固有ドキュメントを確認
+2. Topgunライブラリのドキュメントを確認
 3. `env/.env.example`の動作例を確認
 4. 上記の検証スクリプトで設定をテスト
 

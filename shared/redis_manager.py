@@ -27,7 +27,7 @@ class BotRedisManager:
         host = self.host or "localhost"
         password = self.password or None
 
-        db_mapping = {"sherrinford": 0, "watson": 1, "gmo_board_watcher": 2}
+        db_mapping = {}
         db_number = db_mapping.get(self.bot_name, 0)
 
         self.client = redis.Redis(

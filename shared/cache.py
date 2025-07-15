@@ -1,4 +1,4 @@
-"""Cache utilities for trading bots"""
+"""Cache utilities for topgun library"""
 import asyncio
 from typing import Any, Optional, Dict
 import logging
