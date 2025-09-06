@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "topgun"
 dynamic = ["version", "readme"]
 description = "topgun"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 keywords = ["aiohttp", "crypto", "exchange", "trading"]
 authors = [
     { name = "kondo", email = "" },
