@@ -9,7 +9,7 @@
 # versioneer-0.17 (https://github.com/warner/python-versioneer)
 
 """Git implementation of _version.py."""
-from typing import Any
+
 import errno
 import os
 import re
@@ -52,7 +52,7 @@ class NotThisMethod(Exception):
     """Exception raised if a method is not valid for the current scenario."""
 
 
-LONG_VERSION_PY: dict[str, Any] = {}
+LONG_VERSION_PY = {}
 HANDLERS = {}
 
 

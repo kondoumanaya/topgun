@@ -2,7 +2,7 @@
 
 # Download static dependencies.
 
-# NOTE: 
+# NOTE:
 # topgun bundles ccxt's awesome static_dependencies to avoid additional dependencies.
 # This mainly includes authentication modules related to DEX and Ethereum.
 

@@ -1,181 +1,246 @@
-# Root-Bot Trading System
+[![CI](https://github.com/your-username/your-repo/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/your-repo/actions/workflows/ci.yml)
 
-Crypto trading bot project with shared topgun library.
+<!-- 使用ツール（ruffなど） -->
 
-## Architecture Overview
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-```
-root-bot/
-├── bots/                    # Individual trading bots (completely isolated)
-│   ├── sherrinford/         # High-frequency scalping bot
-│   │   ├── main.py          # Bot implementation
-│   │   ├── Dockerfile       # Individual container
-│   │   └── requirements.txt # Bot-specific dependencies
-│   ├── watson/              # Trend following bot
-│   └── gmo_board_watcher/   # GMO order book monitoring
-├── shared/                  # Common libraries (lightweight)
-│   ├── logger.py            # QueueLogging for non-blocking I/O
-│   ├── database.py          # SQLite wrapper with aiosqlite
-│   ├── notifier.py          # Discord-only weekly profit reports
-│   └── redis_manager.py     # Optional Redis per-bot
-├── topgun/                  # Exchange API library (editable install)
-│   └── tests/               # tests
-├── docker/                  # Container configurations
-│   ├── base.Dockerfile      # Lightweight Python 3.12-slim base
-│   └── docker-compose.yml   # Production deployment
-├── env/                     # Environment configuration
-│   ├── .env.example         # Template with <FILL_ME> placeholders
-│   ├── sherrinford.env      # Production config (Git ignored)
-│   └── watson.env           # Production config (Git ignored)
-├── .github/workflows/       # CI/CD Pipeline
-│   └── ci.yml               # Lint → Test → Build → Deploy
-└── docs/                    # Documentation
-    ├── api_key_guide.md     # API key setup instructions
-    └── architecture.png     # System architecture diagram
-```
+# topgun
 
-## 環境構築
+![topgun logo](https://raw.githubusercontent.com/topgun/topgun/main/docs/logo_150.png)
 
-### 1. 依存関係のインストール
+An advanced API client for python botters. This project is in Japanese.
 
-```bash
-# Clone and setup
-git clone https://github.com/kondoumanaya/root-bot.git
-cd root-bot
+## 📌 Description
 
-# Install dependencies
-pip install -e ./topgun
-pip install -r requirements.txt
+`topgun` is a Python library for [仮想通貨 botter (crypto bot traders)](https://medium.com/perpdex/botter-the-crypto-bot-trader-in-japan-2f5f2a65856f).
 
-# Configure environment
-cp env/.env.example env/.env.production
-# Edit env/.env.production with your API keys (see docs/api_key_guide.md)
-```
+This library is an **HTTP and WebSocket API client**.
+It has the following features, making it useful for developing a trading bot.
 
-### 2. Production Deployment
+## 🚀 Features
 
-```bash
-# Build base image
-docker build -f docker/base.Dockerfile -t root-bot-base:latest .
+- ✨ HTTP / WebSocket Client
+  - **Automatic authentication** for private APIs.
+  - WebSocket **automatic reconnection** and **automatic heartbeat**.
+  - A client based on [`aiohttp`](https://docs.aiohttp.org/).
+- ✨ DataStore
+  - WebSocket message data handler.
+  - **Processing of differential data** such as order book updates
+  - **High-speed data processing** and querying
+- ✨ Other Experiences
+  - Support for type hints.
+  - Asynchronous programming using [`asyncio`](https://docs.python.org/ja/3/library/asyncio.html).
+  - Discord community.
 
-# Start all bots
-docker-compose up -d
+## 🏦 Exchanges
 
-# Start individual bot
-docker-compose up sherrinford
+| Name        | API auth | DataStore  | Exchange API docs                                                           |
+| ----------- | -------- | ---------- | --------------------------------------------------------------------------- |
+| bitFlyer    | ✅       | ✅         | [Link](https://lightning.bitflyer.com/docs)                                 |
+| GMO Coin    | ✅       | ✅         | [Link](https://api.coin.z.com/docs/)                                        |
+| bitbank     | ✅       | ✅         | [Link](https://github.com/bitbankinc/bitbank-api-docs)                      |
+| Coincheck   | ✅       | ✅         | [Link](https://coincheck.com/ja/documents/exchange/api)                     |
+| OKJ         | ✅       | Not yet    | [Link](https://dev.okcoin.jp/en/)                                           |
+| BitTrade    | ✅       | Not yet    | [Link](https://api-doc.bittrade.co.jp/)                                     |
+| Bybit       | ✅       | ✅         | [Link](https://bybit-exchange.github.io/docs/v5/intro)                      |
+| Binance     | ✅       | ✅         | [Link](https://developers.binance.com/docs/binance-spot-api-docs/CHANGELOG) |
+| OKX         | ✅       | ✅         | [Link](https://www.okx.com/docs-v5/en/)                                     |
+| Phemex      | ✅       | ✅         | [Link](https://phemex-docs.github.io/)                                      |
+| Bitget      | ✅       | ✅         | [Link](https://www.bitget.com/api-doc/common/intro)                         |
+| MEXC        | ✅       | No support | [Link](https://mexcdevelop.github.io/apidocs/spot_v3_en/)                   |
+| KuCoin      | ✅       | ✅         | [Link](https://www.kucoin.com/docs/beginners/introduction)                  |
+| BitMEX      | ✅       | ✅         | [Link](https://www.bitmex.com/app/apiOverview)                              |
+| Hyperliquid | ✅       | Partially  | [Link](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api)  |
+
+## 🐍 Requires
+
+Python 3.12+
+
+## 🔧 Installation
+
+```sh
+pip install -e topgun
 ```
 
-## Key Features
+From [GitHub](https://github.com/topgun/topgun) (latest version):
 
-### ✅ Complete Bot Isolation
-
-- Each bot has its own SQLite database (`/data/<bot>.db`)
-- Optional Redis per bot with separate passwords and DB numbers
-- Individual Docker containers with isolated dependencies
-- No shared state between bots
-
-### ✅ High-Performance Logging
-
-- QueueLogging with background threads for non-blocking I/O
-- RotatingFileHandler (1MB max, 3 backups)
-- Trading loops never blocked by log writes
-
-### ✅ Discord-Only Notifications
-
-- Weekly profit reports every Monday 00:00 JST
-- Simple webhook integration
-
-### ✅ Automated CI/CD
-
-- GitHub Actions: Lint → Test → Build → Deploy
-- Parallel Docker builds for all bots
-- SSH deployment to production server
-- GHCR (GitHub Container Registry) for image storage
-
-## Individual Bot Execution
-
-```bash
-# Direct execution (development)
-cd bots/sherrinford && python main.py
-cd bots/watson && python main.py
-cd bots/gmo_board_watcher && python main.py
-
-# Docker execution (recommended)
-docker-compose up sherrinford
-docker-compose up watson
-docker-compose up gmo_board_watcher
+```sh
+pip install git+https://github.com/topgun/topgun.git
 ```
 
-## Production Workflow
+> [!IMPORTANT]
+> The roadmap is here: [topgun/topgun#248](https://github.com/topgun/topgun/issues/248)
 
-### Code Quality
+## 📝 Usage
 
-```bash
-# Lint and type checking
-flake8 bots shared
-mypy bots shared
+Example of bitFlyer API:
+
+### HTTP API
+
+New interface from version 1.0: **Fetch API**.
+
+More simple request/response.
+
+```py
+import asyncio
+
+import topgun
+
+apis = {
+    "bitflyer": ["YOUER_BITFLYER_API_KEY", "YOUER_BITFLYER_API_SECRET"],
+}
+
+
+async def main():
+    async with topgun.Client(
+        apis=apis, base_url="https://api.bitflyer.com"
+    ) as client:
+        # Fetch balance
+        r = await client.fetch("GET", "/v1/me/getbalance")
+
+        print(r.response.status, r.response.reason, r.response.url)
+        print(r.data)
+
+        # Create order
+        CREATE_ORDER = False  # Set to `True` if you are trying to create an order.
+        if CREATE_ORDER:
+            r = await client.fetch(
+                "POST",
+                "/v1/me/sendchildorder",
+                data={
+                    "product_code": "BTC_JPY",
+                    "child_order_type": "MARKET",
+                    "side": "BUY",
+                    "size": 0.001,
+                },
+            )
+
+            print(r.response.status, r.response.reason, r.response.url)
+            print(r.data)
+
+
+asyncio.run(main())
 ```
 
-### Adding New Bots
+aiohttp-based API.
 
-1. Copy template: `cp -r bots/template_bot bots/new_bot`
-2. Update `bots/new_bot/main.py` with trading logic
-3. Create `bots/new_bot/Dockerfile` following existing pattern
-4. Add service to `docker/docker-compose.yml`
-5. Create environment file: `env/new_bot.env`
-6. Update CI matrix in `.github/workflows/ci.yml`
+```python
+import asyncio
 
-### Database Management
+import topgun
 
-- Each bot automatically creates its SQLite database on first run
-- Database path: `/data/<bot_name>.db` (configurable via `SQLITE_PATH`)
-- No migrations needed - tables created automatically
-- Backup: Simply copy the `.db` files
+apis = {
+    "bitflyer": ["YOUER_BITFLYER_API_KEY", "YOUER_BITFLYER_API_SECRET"],
+}
 
-### Redis Usage (Optional)
 
-- Set `USE_REDIS=true` in bot environment file
-- Configure `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
-- Each bot gets isolated Redis instance or DB number
+async def main():
+    async with topgun.Client(
+        apis=apis, base_url="https://api.bitflyer.com"
+    ) as client:
+        # Fetch balance
+        async with client.get("/v1/me/getbalance") as resp:
+            data = await resp.json()
 
-## Security & Configuration
+        print(resp.status, resp.reason)
+        print(data)
 
-### API Keys
+        # Create order
+        CREATE_ORDER = False  # Set to `True` if you are trying to create an order.
+        if CREATE_ORDER:
+            async with client.post(
+                "/v1/me/sendchildorder",
+                data={
+                    "product_code": "BTC_JPY",
+                    "child_order_type": "MARKET",
+                    "side": "BUY",
+                    "size": 0.001,
+                },
+            ) as resp:
+                data = await resp.json()
 
-- See [docs/api_key_guide.md](docs/api_key_guide.md) for detailed setup
-- Never commit actual keys to Git
-- Use `<FILL_ME>` placeholders in templates
-- Production keys stored outside Git repository
+            print(data)
 
-### GitHub Secrets (for CI/CD)
 
-- `GHCR_TOKEN`: GitHub Container Registry access
-- `PROD_HOST`: Production server hostname
-- `PROD_USER`: SSH username for deployment
-- `PROD_KEY`: SSH private key for deployment
+asyncio.run(main())
+```
 
-## Architecture Benefits
+### WebSocket API
 
-### Scalability
+```python
+import asyncio
 
-- Add new bots without affecting existing ones
-- Deploy bots to different servers independently
-- Scale individual bots based on resource needs
+import topgun
 
-### Reliability
 
-- Bot failures don't affect other bots
-- Database corruption isolated to single bot
-- Independent restart and recovery
+async def main():
+    async with topgun.Client() as client:
+        # Create a Queue
+        wsqueue = topgun.WebSocketQueue()
 
-### Maintainability
+        # Connect to WebSocket and subscribe to Ticker
+        await client.ws_connect(
+            "wss://ws.lightstream.bitflyer.com/json-rpc",
+            send_json={
+                "method": "subscribe",
+                "params": {"channel": "lightning_ticker_BTC_JPY"},
+            },
+            hdlr_json=wsqueue.onmessage,
+        )
 
-- Clear separation of concerns
-- Minimal shared dependencies
-- Easy to debug and monitor individual bots
+        # Iterate message (Ctrl+C to break)
+        async for msg in wsqueue:
+            print(msg)
 
-### Performance
 
-- No database lock contention between bots
-- Non-blocking logging system
-- Lightweight containers with minimal overhead
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    pass
+```
+
+### DataStore
+
+```py
+import asyncio
+
+import topgun
+
+
+async def main():
+    async with topgun.Client() as client:
+        # Create DataStore
+        store = topgun.bitFlyerDataStore()
+
+        # Connect to WebSocket and subscribe to Board
+        await client.ws_connect(
+            "wss://ws.lightstream.bitflyer.com/json-rpc",
+            send_json=[
+                {
+                    "method": "subscribe",
+                    "params": {"channel": "lightning_board_snapshot_BTC_JPY"},
+                },
+                {
+                    "method": "subscribe",
+                    "params": {"channel": "lightning_board_BTC_JPY"},
+                },
+            ],
+            hdlr_json=store.onmessage,
+        )
+
+        # Watch for the best prices on Board. (Ctrl+C to break)
+        with store.board.watch() as stream:
+            async for change in stream:
+                board = store.board.sorted(limit=2)
+                print(board)
+
+
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    pass
+```
+
+## 📖 Documentation
+
+🔗 https://topgun.readthedocs.io/ja/stable/ (Japanese)
