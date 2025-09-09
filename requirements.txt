@@ -35,7 +35,6 @@ setuptools==80.9.0
 six==1.17.0
 threadpoolctl==3.6.0
 # Editable install with no version control (topgun==0.1.0.dev524)
--e /Users/manayakondou/Documents/root-bot/topgun
 typeguard==4.4.3
 types-cffi==1.17.0.20250523
 types-pyOpenSSL==24.1.0.20240722
