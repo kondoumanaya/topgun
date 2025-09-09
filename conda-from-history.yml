@@ -1,0 +1,7 @@
+name: root-bot
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+prefix: /Users/manayakondou/miniconda3/envs/root-bot
