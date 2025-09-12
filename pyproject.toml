@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling", "hatch-fancy-pypi-readme", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "topgun"
+dynamic = ["version", "readme"]
+description = "topgun"
+requires-python = ">=3.13"
+keywords = ["aiohttp", "crypto", "exchange", "trading"]
+authors = [
+    { name = "kondo", email = "" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: AsyncIO",
+    "Framework :: aiohttp",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Natural Language :: Japanese",
+    "Typing :: Typed",
+]
+dependencies = [
+    "aiohttp>=3.7",
+    "typing-extensions>=3.10 ; python_version < \"3.10\"",
+]
+
+[project.urls]
+Documentation = "https://topgun.readthedocs.io/ja/stable/"
+Repository = "https://github.com/topgun/topgun"
+
+[tool.uv.sources]
+topgun = { workspace = true }
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+version_scheme = "python-simplified-semver"
+local_scheme = "no-local-version"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+[tool.coverage.run]
+source_pkgs = ["topgun", "tests"]
+parallel = true
+omit = [
+    "topgun/models/*",
+    "topgun/_static_dependencies/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+fail_under = 100.0
+
+[tool.ruff]
+line-length = 88
+include = ["pyproject.toml", "topgun/**/*.py", "tests/**/*.py"]
+extend-exclude = ["topgun/_static_dependencies"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "TC"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["topgun", "tests"]
+exclude = ["topgun/_static_dependencies/.*"]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
