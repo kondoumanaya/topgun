@@ -5,16 +5,13 @@ import logging
 import warnings
 from typing import TYPE_CHECKING, Awaitable
 
-from ..store import DataStore, DataStoreCollection
-
 from ..auth import Auth
-
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     import aiohttp
 
     from ..typedefs import Item
-
     from ..ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
@@ -206,7 +203,9 @@ class GMOCoinDataStore(DataStoreCollection):
             elif channel == "positionSummaryEvents":
                 self.position_summary._onmessage(msg)
 
-    async def _token(self, session: aiohttp.ClientSession) -> None:  # DeprecationWarning
+    async def _token(
+        self, session: aiohttp.ClientSession
+    ) -> None:  # DeprecationWarning
         while not session.closed:
             await session.put(
                 "https://api.coin.z.com/private/v1/ws-auth",
