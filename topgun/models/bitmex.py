@@ -164,7 +164,7 @@ class BitMEXDataStore(DataStoreCollection):
     def order(self) -> DataStore:
         """order topic.
 
-        アクティブオーダーのみデータが格納される。 キャンセル、約定済みなどは削除される。
+        アクティブオーダーのみデータが格納されます。 キャンセル、約定済みなどは削除されます。
         """
         return self._get("order", DataStore)
 

@@ -7,15 +7,15 @@ from decimal import Decimal
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Any, Awaitable, TypedDict, cast
 
-from topgun.auth import Auth
+from PROJECT.store import DataStore, DataStoreCollection
 
-from ..store import DataStore, DataStoreCollection
+from ...auth import Auth
 
 if TYPE_CHECKING:
     import aiohttp
 
-    from ..typedefs import Item
-    from ..ws import ClientWebSocketResponse
+    from ...typedefs import Item
+    from ...ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 
@@ -482,8 +482,8 @@ class MessageHelper:
             symbol=Symbol[data["symbol"]],
             settle_type=SettleType[data["settleType"]],
             side=OrderSide[data["side"]],
-            price=Decimal(data.get("executionPrice", data.get("price"))),
-            size=Decimal(data.get("executionSize", data.get("size"))),
+            price=Decimal(data.get("executionPrice") or data["price"]),
+            size=Decimal(data.get("executionSize") or data["size"]),
             timestamp=parse_datetime(
                 data.get("executionTimestamp", data.get("timestamp"))
             ),
@@ -511,7 +511,7 @@ class MessageHelper:
 
     @staticmethod
     def to_order(data: Item) -> "Order":
-        status = OrderStatus[data.get("status", data.get("orderStatus"))]
+        status = OrderStatus[data.get("status") or data["orderStatus"]]
         timestamp = parse_datetime(data.get("orderTimestamp", data.get("timestamp")))
         return Order(
             order_id=data["orderId"],
@@ -522,10 +522,10 @@ class MessageHelper:
             order_status=status,
             cancel_type=CancelType[data.get("cancelType", CancelType.NONE.name)],
             order_timestamp=timestamp,
-            price=Decimal(data.get("price", data.get("orderPrice"))),
-            size=Decimal(data.get("size", data.get("orderSize"))),
+            price=Decimal(data.get("price") or data["orderPrice"]),
+            size=Decimal(data.get("size") or data["orderSize"]),
             executed_size=Decimal(
-                data.get("executedSize", data.get("orderExecutedSize"))
+                data.get("executedSize") or data["orderExecutedSize"]
             ),
             losscut_price=Decimal(data["losscutPrice"]),
             time_in_force=data["timeInForce"],
@@ -653,12 +653,12 @@ class GMOCoinDataStore(DataStoreCollection):
             elif channel == Channel.POSITION_SUMMARY_EVENTS:
                 self.position_summary._onmessage(MessageHelper.to_position_summary(msg))
 
-    async def _token(self, session: aiohttp.ClientSession) -> None:
+    async def _token(self, session: aiohttp.ClientSession):
         while not session.closed:
             await session.put(
                 "https://api.coin.z.com/private/v1/ws-auth",
                 data={"token": self.token},
-                auth=Auth,  # type: ignore[arg-type]
+                auth=Auth,
             )
             await asyncio.sleep(1800.0)  # 30 minutes
 

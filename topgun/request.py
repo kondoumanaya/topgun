@@ -6,7 +6,7 @@ import aiohttp
 from aiohttp.payload import JsonPayload
 from multidict import MultiDict
 
-from topgun.auth import Auth, Hosts
+from .auth import Auth, Hosts
 
 if TYPE_CHECKING:
     from collections.abc import Callable

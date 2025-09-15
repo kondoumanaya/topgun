@@ -324,3 +324,14 @@ async def test_client_ws_connect(mocker: pytest_mock.MockerFixture):
         },
     ]
     assert ret == m.return_value
+
+
+@pytest.mark.asyncio
+async def test_client_ws_connect_hdlr_type(mocker: pytest_mock.MockerFixture) -> None:
+    m = mocker.patch("PROJECT.client.WebSocketApp", new_callable=AsyncMock)
+
+    async with topgun.Client() as client:
+        store = topgun.DataStoreCollection()
+        await client.ws_connect("ws://example.com", hdlr_json=store.onmessage)
+
+    assert m.called

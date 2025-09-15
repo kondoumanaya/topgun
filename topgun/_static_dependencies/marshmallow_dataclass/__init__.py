@@ -11,8 +11,8 @@ Simple example::
 
     @dataclass
     class Point:
-    x:float
-    y:float
+      x:float
+      y:float
 
     point = Point(x=0, y=0)
     point_json = Point.Schema().dumps(point)
@@ -26,13 +26,13 @@ Full example::
 
     @dataclass
     class User:
-    birth: datetime.date = field(metadata= {
+      birth: datetime.date = field(metadata= {
         "required": True # A parameter to pass to marshmallow's field
-    })
-    website:str = field(metadata = {
+      })
+      website:str = field(metadata = {
         "marshmallow_field": marshmallow.fields.Url() # Custom marshmallow field
-    })
-    Schema: ClassVar[Type[Schema]] = Schema # For the type checker
+      })
+      Schema: ClassVar[Type[Schema]] = Schema # For the type checker
 """
 
 import collections.abc
@@ -64,13 +64,10 @@ from typing import (
     get_type_hints,
     overload,
 )
-from marshmallow.fields import Dict as MarshmallowDictField
 
-
-import collections.abc
-import marshmallow
-from .. import typing_extensions
-from .. import typing_inspect
+from .. import marshmallow
+from ..typing_extensions import *
+from ..typing_inspect import *
 
 from .lazy_class_attribute import lazy_class_attribute
 
@@ -652,8 +649,6 @@ def _generic_type_add_any(typ: type) -> type:
         typ = FrozenSet[Any]
     return typ
 
-from . import collection_field
-from . import typing_extensions
 
 def _field_for_generic_type(
     typ: type,
@@ -676,7 +671,6 @@ def _field_for_generic_type(
                 type_mapping.get(List, marshmallow.fields.List),
             )
             return list_type(child_type, **metadata)
-
         if origin in (collections.abc.Sequence, Sequence) or (
             origin in (tuple, Tuple)
             and len(arguments) == 2
@@ -685,10 +679,7 @@ def _field_for_generic_type(
             from . import collection_field
 
             child_type = _field_for_schema(arguments[0], base_schema=base_schema)
-            return cast(
-                marshmallow.fields.Field,
-                collection_field.Sequence(cls_or_instance=child_type, **metadata)
-            )
+            return collection_field.Sequence(cls_or_instance=child_type, **metadata)
         if origin in (set, Set):
             from . import collection_field
 
@@ -715,10 +706,7 @@ def _field_for_generic_type(
             )
             return tuple_type(children, **metadata)
         elif origin in (dict, Dict, collections.abc.Mapping, Mapping):
-            dict_type = cast(
-                Type[MarshmallowDictField],
-                type_mapping.get(Dict, marshmallow.fields.Dict)
-                )
+            dict_type = type_mapping.get(Dict, marshmallow.fields.Dict)
             return dict_type(
                 keys=_field_for_schema(arguments[0], base_schema=base_schema),
                 values=_field_for_schema(arguments[1], base_schema=base_schema),
