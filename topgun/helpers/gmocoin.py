@@ -19,7 +19,7 @@ class GMOCoinHelper:
         """Post-maintenance reconnection helper for GMO Coin.
 
         Args:
-            client (Client): PROJECT.Client
+            client (Client): topgun.Client
         """
         self._client = client
         self._url = "https://api.coin.z.com/private/v1/ws-auth".removeprefix(
