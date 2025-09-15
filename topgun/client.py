@@ -54,7 +54,7 @@ class Client:
             **kwargs,
         )
         if hdrs.USER_AGENT not in self._session.headers:
-            self._session.headers[hdrs.USER_AGENT] = f"PROJECT/{__version__}"
+            self._session.headers[hdrs.USER_AGENT] = f"topgun/{__version__}"
         loaded_apis = self._load_apis(apis)
         self._session.__dict__["_apis"] = self._encode_apis(loaded_apis)
         self._base_url = base_url

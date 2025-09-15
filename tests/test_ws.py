@@ -1708,7 +1708,7 @@ async def test_auth_bittrade_ws(test_input, expected, caplog):
                 ],
             },
             {
-                "records": [("PROJECT.ws", logging.WARNING, ANY)],
+                "records": [("topgun.ws", logging.WARNING, ANY)],
             },
         ),
     ],
@@ -1735,7 +1735,7 @@ async def test_auth_coincheck_ws(test_input, expected, caplog) -> None:
             "access_signature": "8ea715c5402f78069b139e4b978b56280292aa616b2b771621b6a2e400956588",
         }
     )
-    assert [x for x in caplog.record_tuples if x[0] == "PROJECT.ws"] == expected[
+    assert [x for x in caplog.record_tuples if x[0] == "topgun.ws"] == expected[
         "records"
     ]
 
@@ -2074,7 +2074,7 @@ def test_msgsign_hyperliquid(test_input, expected):
     full_expected["request"]["payload"].update(expected)
 
     with freezegun.freeze_time(datetime.fromtimestamp(0, tz=timezone.utc)):
-        PROJECT.ws.MessageSignHosts.items[test_input.host].func(m_wsresp, mutable_input)
+        topgun.ws.MessageSignHosts.items[test_input.host].func(m_wsresp, mutable_input)
 
     assert mutable_input == full_expected
 
@@ -2121,6 +2121,6 @@ def test_msgsign_hyperliquid_ignore(test_input):
     m_wsresp._response.url = url
     expected = copy.deepcopy(test_input)
 
-    PROJECT.ws.MessageSignHosts.items[url.host].func(m_wsresp, test_input)
+    topgun.ws.MessageSignHosts.items[url.host].func(m_wsresp, test_input)
 
     assert test_input == expected
