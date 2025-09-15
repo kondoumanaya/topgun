@@ -41,12 +41,12 @@ class Client:
     ) -> None:
         """HTTP / WebSocket API Client.
 
-        自動認証を備えた HTTP クライアント 。
+        自動認証を備えた HTTP クライアントです。
 
         Args:
             apis: API 認証情報
             base_url: ベース URL
-            **kwargs: aiohttp.ClientSession にバイパスされる引数
+            **kwargs: :class:`aiohttp.ClientSession` にバイパスされる引数
         """
         self._session = aiohttp.ClientSession(
             request_class=ClientRequest,
@@ -54,7 +54,7 @@ class Client:
             **kwargs,
         )
         if hdrs.USER_AGENT not in self._session.headers:
-            self._session.headers[hdrs.USER_AGENT] = f"topgun/{__version__}"
+            self._session.headers[hdrs.USER_AGENT] = f"PROJECT/{__version__}"
         loaded_apis = self._load_apis(apis)
         self._session.__dict__["_apis"] = self._encode_apis(loaded_apis)
         self._base_url = base_url
@@ -109,10 +109,10 @@ class Client:
             params: リクエスト URL のクエリ文字列
             data: リクエストの本文で送信するデータ
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.request にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.request` にバイパスされる引数
 
         Returns:
-            aiohttp.ClientResponse
+            :class:`aiohttp.ClientResponse`
 
         Usage example: :ref:`http-method-api`
         """
@@ -135,7 +135,7 @@ class Client:
             params: リクエスト URL のクエリ文字列
             data: リクエストの本文で送信するデータ
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.request にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.request` にバイパスされる引数
 
         Returns:
             FetchResult
@@ -166,10 +166,10 @@ class Client:
             url: リクエスト URL
             params: リクエスト URL のクエリ文字列
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.request にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.request` にバイパスされる引数
 
         Returns:
-            aiohttp.ClientResponse
+            :class:`aiohttp.ClientResponse`
 
         Usage example: :ref:`http-method-api`
         """
@@ -188,10 +188,10 @@ class Client:
             url: リクエスト URL
             data: リクエストの本文で送信するデータ
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.request にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.request` にバイパスされる引数
 
         Returns:
-            aiohttp.ClientResponse
+            :class:`aiohttp.ClientResponse`
 
         Usage example: :ref:`http-method-api`
         """
@@ -211,10 +211,10 @@ class Client:
             params: リクエスト URL のクエリ文字列
             data: リクエストの本文で送信するデータ
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.request にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.request` にバイパスされる引数
 
         Returns:
-            aiohttp.ClientResponse
+            :class:`aiohttp.ClientResponse`
 
         Usage example: :ref:`http-method-api`
         """
@@ -234,10 +234,10 @@ class Client:
             params: リクエスト URL のクエリ文字列
             data: リクエストの本文で送信するデータ
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.request にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.request` にバイパスされる引数
 
         Returns:
-            aiohttp.ClientResponse
+            :class:`aiohttp.ClientResponse`
 
         Usage example: :ref:`http-method-api`
         """
@@ -273,7 +273,7 @@ class Client:
             autoping: Ping に対する自動 Pong 応答 (デフォルト True)
             heartbeat: WebSocket ハートビート (デフォルト 10.0 秒)
             auth: 認証オプション (デフォルトで有効、None で無効)
-            **kwargs: aiohttp.ClientSession.ws_connect にバイパスされる引数
+            **kwargs: :meth:`aiohttp.ClientSession.ws_connect` にバイパスされる引数
 
         Returns:
             WebSocketApp
@@ -306,7 +306,7 @@ class Client:
                 with open(current_apis) as fp:
                     return json.load(fp)
             else:
-                env_apis = os.getenv("topgun_APIS")
+                env_apis = os.getenv("PYBOTTERS_APIS")
                 if env_apis and os.path.isfile(env_apis):
                     with open(env_apis) as fp:
                         return json.load(fp)
@@ -346,7 +346,7 @@ class FetchResult:
     """Fetch API result.
 
     Attributes:
-        response: `aiohttp.ClientResponse`
+        response: :class:`aiohttp.ClientResponse`
         text: テキストデータ
         data: JSON データ (JSON ではない場合は :class:`.NotJSONContent`)
     """

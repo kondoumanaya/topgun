@@ -5,8 +5,8 @@ import logging
 from typing import TYPE_CHECKING, NoReturn
 
 if TYPE_CHECKING:
-    from topgun.client import Client
-    from topgun.ws import WebSocketApp
+    from ..client import Client
+    from ..ws import WebSocketApp
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class GMOCoinHelper:
         """Post-maintenance reconnection helper for GMO Coin.
 
         Args:
-            client (Client): topgun.Client
+            client (Client): PROJECT.Client
         """
         self._client = client
         self._url = "https://api.coin.z.com/private/v1/ws-auth".removeprefix(

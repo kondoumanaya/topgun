@@ -5,10 +5,9 @@ from mypy import nodes
 from mypy.plugin import DynamicClassDefContext, Plugin
 from mypy.plugins import dataclasses
 
-# from . import marshmallow_dataclass
-from . import NewType
+import marshmallow_dataclass
 
-_NEW_TYPE_SIG = inspect.signature(NewType)
+_NEW_TYPE_SIG = inspect.signature(marshmallow_dataclass.NewType)
 
 
 def plugin(version: str) -> Type[Plugin]:
