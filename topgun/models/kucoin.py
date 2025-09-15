@@ -347,7 +347,7 @@ class KuCoinDataStore(DataStoreCollection):
         endpoint, host = None, None
 
         try:
-            from topgun.ws import HeartbeatHosts
+            from PROJECT.ws import HeartbeatHosts
 
             for s in servers:
                 host = aiohttp.typedefs.URL(s["endpoint"]).host

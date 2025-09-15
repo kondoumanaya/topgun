@@ -40,13 +40,13 @@ import hashlib
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, TypedDict, cast
 
-from topgun._static_dependencies import keccak, msgpack
-from topgun._static_dependencies.ecdsa import SECP256k1, SigningKey
-from topgun._static_dependencies.ecdsa.util import (
+from PROJECT._static_dependencies import keccak, msgpack
+from PROJECT._static_dependencies.ecdsa import SECP256k1, SigningKey
+from PROJECT._static_dependencies.ecdsa.util import (
     sigencode_strings_canonize,
     string_to_number,
 )
-from topgun._static_dependencies.ethereum.account.messages import (
+from PROJECT._static_dependencies.ethereum.account.messages import (
     encode_typed_data,
 )
 
@@ -102,7 +102,11 @@ class Signature(TypedDict):
 
 
 def construct_l1_action(
-    action: MessageData, nonce: int, is_mainnet: bool, vault_address: str | None = None
+    action: MessageData,
+    nonce: int,
+    is_mainnet: bool,
+    vault_address: str | None = None,
+    expires_after: int | None = None,
 ) -> tuple[EIP712Domain, MessageTypes, PhantomAgentMessage]:
     """Construct EIP-712 typed data for Hyperliquid L1 action.
 
@@ -124,6 +128,9 @@ def construct_l1_action(
     else:
         data += b"\x01"
         data += bytes.fromhex(f"{int(vault_address, 16):x}")  # address_to_bytes
+    if expires_after is not None:
+        data += b"\x00"
+        data += expires_after.to_bytes(8, "big")
     hash_val = keccak.SHA3(data)
 
     # Ref: hyperliquid.utils.signing.construct_phantom_agent

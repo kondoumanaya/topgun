@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any, Awaitable
 
 import aiohttp
 
-from topgun.auth import Auth
-from topgun.store import DataStore, DataStoreCollection
+from ..auth import Auth
+from ..store import DataStore, DataStoreCollection
 
 if TYPE_CHECKING:
     from yarl import URL
 
-    from topgun.typedefs import Item
-    from topgun.ws import ClientWebSocketResponse
+    from ..typedefs import Item
+    from ..ws import ClientWebSocketResponse
 
 logger = logging.getLogger(__name__)
 
@@ -261,7 +261,7 @@ class BinanceDataStoreBase(DataStoreCollection):
     def order(self) -> "Order":
         """executionReport/ORDER_TRADE_UPDATE from User Data Streams.
 
-        アクティブオーダーのみデータが格納される。 キャンセル、約定済みなどは削除される。
+        アクティブオーダーのみデータが格納されます。 キャンセル、約定済みなどは削除されます。
 
         * Spot
             * https://developers.binance.com/docs/binance-spot-api-docs/user-data-stream#order-update

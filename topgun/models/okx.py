@@ -279,7 +279,7 @@ class _CandleStore(DataStore):
     def _onmessage(self, msg: dict[str, Any]) -> None:
         for item in msg["data"]:
             self._update(
-                [{**msg["arg"], **dict(zip(self._LIST_KEYS, item, strict=True))}]
+                [{**msg["arg"], **dict(zip(self._LIST_KEYS, item, strict=False))}]
             )
 
 
@@ -342,7 +342,7 @@ class Books(DataStore):
                     item = {
                         "instId": inst_id,
                         "side": side,
-                        **dict(zip(self._LIST_KEYS, item, strict=True)),
+                        **dict(zip(self._LIST_KEYS, item, strict=False)),
                     }
                     if item["sz"] != "0":
                         self._update([item])

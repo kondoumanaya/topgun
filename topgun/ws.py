@@ -29,7 +29,7 @@ if TYPE_CHECKING:
         Generator,
     )
 
-    from topgun.typedefs import (
+    from .typedefs import (
         WsBytesHandler,
         WsHeartBeatHandler,
         WsJsonHandler,
@@ -79,7 +79,7 @@ class WebSocketApp:
         self._url = url
 
         self._loop = session._loop
-        self._current_ws: aiohttp.ClientWebSocketResponse | None = None
+        self._current_ws: ClientWebSocketResponse | None = None
         self._event = asyncio.Event()
 
         self._autoping = kwargs.pop("autoping", True)
@@ -142,7 +142,7 @@ class WebSocketApp:
         self._url = url
 
     @property
-    def current_ws(self) -> aiohttp.ClientWebSocketResponse | None:
+    def current_ws(self) -> ClientWebSocketResponse | None:
         """Current WebSocket connection.
 
         現在の WebSocket コネクション 。
@@ -207,10 +207,11 @@ class WebSocketApp:
         **kwargs: Any,
     ) -> None:
         async with self._session.ws_connect(self._url, autoping=False, **kwargs) as ws:
+            ws = cast("ClientWebSocketResponse", ws)
             self._current_ws = ws
             self._event.set()
 
-            await cast("ClientWebSocketResponse", ws)._wait_authtask()
+            await ws._wait_authtask()
 
             await self._ws_send(ws, send_str, send_bytes, send_json)
 
@@ -218,7 +219,7 @@ class WebSocketApp:
 
     async def _ws_send(
         self,
-        ws: aiohttp.ClientWebSocketResponse,
+        ws: ClientWebSocketResponse,
         send_str: list[str],
         send_bytes: list[bytes],
         send_json: list[dict],
@@ -231,7 +232,7 @@ class WebSocketApp:
 
     async def _ws_receive(
         self,
-        ws: aiohttp.ClientWebSocketResponse,
+        ws: ClientWebSocketResponse,
         hdlr_str: list[WsStrHandler],
         hdlr_bytes: list[WsBytesHandler],
         hdlr_json: list[WsJsonHandler],
@@ -244,7 +245,7 @@ class WebSocketApp:
     def _onmessage(
         self,
         msg: aiohttp.WSMessage,
-        ws: aiohttp.ClientWebSocketResponse,
+        ws: ClientWebSocketResponse,
         hdlr_str: list[WsStrHandler],
         hdlr_bytes: list[WsBytesHandler],
         hdlr_json: list[WsJsonHandler],
@@ -327,7 +328,7 @@ class WebSocketApp:
 class WebSocketQueue(asyncio.Queue):
     """WebSocket queue (from asyncio.Queue)."""
 
-    def onmessage(self, msg: Any, ws: aiohttp.ClientWebSocketResponse):
+    def onmessage(self, msg: Any, ws: ClientWebSocketResponse):
         """WebSocket message hander callback."""
         self.put_nowait(msg)
 
@@ -339,37 +340,37 @@ class WebSocketQueue(asyncio.Queue):
 
 class Heartbeat:
     @staticmethod
-    async def bybit(ws: aiohttp.ClientWebSocketResponse):
+    async def bybit(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str('{"op":"ping"}')
             await asyncio.sleep(20.0)
 
     @staticmethod
-    async def bitbank(ws: aiohttp.ClientWebSocketResponse):
+    async def bitbank(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str("2")
             await asyncio.sleep(15.0)
 
     @staticmethod
-    async def binance(ws: aiohttp.ClientWebSocketResponse):
+    async def binance(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.pong()
             await asyncio.sleep(60.0)
 
     @staticmethod
-    async def phemex(ws: aiohttp.ClientWebSocketResponse):
+    async def phemex(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str('{"method":"server.ping","params":[],"id":123}')
             await asyncio.sleep(10.0)
 
     @staticmethod
-    async def okx(ws: aiohttp.ClientWebSocketResponse):
+    async def okx(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str("ping")
             await asyncio.sleep(15.0)
 
     @staticmethod
-    async def bitget(ws: aiohttp.ClientWebSocketResponse):
+    async def bitget(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str("ping")
             # Refer to official SDK
@@ -377,25 +378,25 @@ class Heartbeat:
             await asyncio.sleep(25.0)
 
     @staticmethod
-    async def mexc(ws: aiohttp.ClientWebSocketResponse):
+    async def mexc(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str('{"method":"ping"}')
             await asyncio.sleep(10.0)
 
     @staticmethod
-    async def kucoin(ws: aiohttp.ClientWebSocketResponse):
+    async def kucoin(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str(f'{{"id": "{uuid.uuid4()}", "type": "ping"}}')
             await asyncio.sleep(15)
 
     @staticmethod
-    async def okj(ws: aiohttp.ClientWebSocketResponse):
+    async def okj(ws: ClientWebSocketResponse):
         while not ws.closed:
             await ws.send_str("ping")
             await asyncio.sleep(15.0)
 
     @staticmethod
-    async def bittrade(ws: aiohttp.ClientWebSocketResponse):
+    async def bittrade(ws: ClientWebSocketResponse):
         # Retail
         if ws._response.url.path == "/retail/ws":
             while not ws.closed:
@@ -415,10 +416,16 @@ class Heartbeat:
                 await ws.send_json({"action": "pong", "data": {"ts": ts}})
                 await asyncio.sleep(20.0)
 
+    @staticmethod
+    async def hyperliquid(ws: ClientWebSocketResponse):
+        while not ws.closed:
+            await ws.send_str('{"method":"ping"}')
+            await asyncio.sleep(30.0)
+
 
 class Auth:
     @staticmethod
-    async def bybit(ws: aiohttp.ClientWebSocketResponse):
+    async def bybit(ws: ClientWebSocketResponse):
         if "public" in ws._response.url.parts:
             return
 
@@ -444,7 +451,7 @@ class Auth:
                 break
 
     @staticmethod
-    async def bitflyer(ws: aiohttp.ClientWebSocketResponse):
+    async def bitflyer(ws: ClientWebSocketResponse):
         key: str = ws._response._session.__dict__["_apis"][
             AuthHosts.items[ws._response.url.host].name
         ][0]
@@ -477,7 +484,7 @@ class Auth:
                 break
 
     @staticmethod
-    async def phemex(ws: aiohttp.ClientWebSocketResponse):
+    async def phemex(ws: ClientWebSocketResponse):
         key: str = ws._response._session.__dict__["_apis"][
             AuthHosts.items[ws._response.url.host].name
         ][0]
@@ -503,7 +510,7 @@ class Auth:
                 break
 
     @staticmethod
-    async def okx(ws: aiohttp.ClientWebSocketResponse):
+    async def okx(ws: ClientWebSocketResponse):
         key: str = ws._response._session.__dict__["_apis"][
             AuthHosts.items[ws._response.url.host].name
         ][0]
@@ -545,7 +552,7 @@ class Auth:
                     break
 
     @staticmethod
-    async def bitget(ws: aiohttp.ClientWebSocketResponse):
+    async def bitget(ws: ClientWebSocketResponse):
         if "public" in ws._response.url.parts:
             return
 
@@ -591,7 +598,7 @@ class Auth:
                     break
 
     @staticmethod
-    async def mexc(ws: aiohttp.ClientWebSocketResponse):
+    async def mexc(ws: ClientWebSocketResponse):
         key: str = ws._response._session.__dict__["_apis"][
             AuthHosts.items[ws._response.url.host].name
         ][0]
@@ -615,7 +622,7 @@ class Auth:
         await ws.send_json(msg)
 
     @staticmethod
-    async def okj(ws: aiohttp.ClientWebSocketResponse):
+    async def okj(ws: ClientWebSocketResponse):
         key: str = ws._response._session.__dict__["_apis"][
             AuthHosts.items[ws._response.url.host].name
         ][0]
@@ -652,7 +659,7 @@ class Auth:
                     break
 
     @staticmethod
-    async def bittrade(ws: aiohttp.ClientWebSocketResponse):
+    async def bittrade(ws: ClientWebSocketResponse):
         method = "GET"
         host = ws._response.url.host
         path = ws._response.url.path
@@ -705,6 +712,37 @@ class Auth:
                 else:
                     logger.warning(data)
 
+    @staticmethod
+    async def coincheck(ws: ClientWebSocketResponse) -> None:
+        key: str = ws._response._session.__dict__["_apis"][
+            AuthHosts.items[ws._response.url.host].name
+        ][0]
+        secret: bytes = ws._response._session.__dict__["_apis"][
+            AuthHosts.items[ws._response.url.host].name
+        ][1]
+
+        # NOTE: Use milliseconds for nonce to maintain compatibility with ccxt (#135)
+        nonce = str(int(time.time() * 1000))
+        url = "wss://stream.coincheck.com/private"
+        message = f"{nonce}{url}".encode()
+        signature = hmac.new(secret, message, hashlib.sha256).hexdigest()
+
+        msg_to_send: object = {
+            "type": "login",
+            "access_key": key,
+            "access_nonce": nonce,
+            "access_signature": signature,
+        }
+        await ws.send_json(msg_to_send)
+
+        async for msg in ws:
+            data: object = msg.json()
+            if isinstance(data, dict) and "success" in data:
+                if not data["success"]:
+                    logger.warning(data)
+
+                break
+
 
 @dataclass
 class Item:
@@ -742,6 +780,8 @@ class HeartbeatHosts:
         "ws-api-futures.kucoin.com": Heartbeat.kucoin,
         "connect.okcoin.jp": Heartbeat.okj,
         "api-cloud.bittrade.co.jp": Heartbeat.bittrade,
+        "api.hyperliquid.xyz": Heartbeat.hyperliquid,
+        "api.hyperliquid-testnet.xyz": Heartbeat.hyperliquid,
     }
 
 
@@ -765,10 +805,15 @@ class AuthHosts:
         "contract.mexc.com": Item("mexc", Auth.mexc),
         "connect.okcoin.jp": Item("okj", Auth.okj),
         "api-cloud.bittrade.co.jp": Item("bittrade", Auth.bittrade),
+        "stream.coincheck.com": Item("coincheck", Auth.coincheck),
     }
 
 
 class ClientWebSocketResponse(aiohttp.ClientWebSocketResponse):
+    """Class for handling client-side websockets.
+
+    This class is a subclass of :class:`aiohttp.ClientWebSocketResponse`."""
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if self._response.url.host in HeartbeatHosts.items:
@@ -791,6 +836,7 @@ class ClientWebSocketResponse(aiohttp.ClientWebSocketResponse):
             await self.__dict__["_authtask"]
 
     async def send_str(self, *args, **kwargs) -> None:
+        """Send *data* to peer as :attr:`aiohttp.WSMsgType.TEXT` message."""
         if self._response.url.host not in RequestLimitHosts.items:
             await super().send_str(*args, **kwargs)
         else:
@@ -798,6 +844,7 @@ class ClientWebSocketResponse(aiohttp.ClientWebSocketResponse):
             await RequestLimitHosts.items[self._response.url.host](self, super_send_str)
 
     async def send_json(self, *args, **kwargs) -> None:
+        """Send *data* to peer as JSON string."""
         if (
             (kwargs.pop("auth", _Auth) is _Auth)
             and (self._response.url.host in MessageSignHosts.items)
@@ -815,9 +862,9 @@ class ClientWebSocketResponse(aiohttp.ClientWebSocketResponse):
 
 class RequestLimit:
     @staticmethod
-    async def gmocoin(ws: aiohttp.ClientWebSocketResponse, send_str: Awaitable[None]):
+    async def gmocoin(ws: ClientWebSocketResponse, send_str: Awaitable[None]):
         session = cast("aiohttp.ClientSession", ws._response._session)
-        async with cast("ClientWebSocketResponse", ws)._lock:
+        async with ws._lock:
             await send_str
             r = await session.get("https://api.coin.z.com/public/v1/status", auth=_Auth)
             data = await r.json()
@@ -834,11 +881,9 @@ class RequestLimit:
                     break
 
     @staticmethod
-    async def binance(
-        ws: aiohttp.ClientWebSocketResponse, send_str: Awaitable[None]
-    ) -> None:
+    async def binance(ws: ClientWebSocketResponse, send_str: Awaitable[None]) -> None:
         session = cast("aiohttp.ClientSession", ws._response._session)
-        async with cast("ClientWebSocketResponse", ws)._lock:
+        async with ws._lock:
             await send_str
             r = await session.get("https://api.binance.com/api/v3/time", auth=None)
             data = await r.json()
@@ -862,7 +907,7 @@ class RequestLimitHosts:
 
 class MessageSign:
     @staticmethod
-    def binance(ws: aiohttp.ClientWebSocketResponse, data: dict[str, Any]):
+    def binance(ws: ClientWebSocketResponse, data: dict[str, Any]):
         key: str = ws._response._session.__dict__["_apis"][
             MessageSignHosts.items[ws._response.url.host].name
         ][0]
@@ -883,12 +928,34 @@ class MessageSign:
         params["signature"] = signature
 
     @staticmethod
-    def bybit(ws: aiohttp.ClientWebSocketResponse, data: dict[str, Any]):
+    def bybit(ws: ClientWebSocketResponse, data: dict[str, Any]):
         if "trade" not in ws._response.url.parts:
             return
 
         if "header" not in data:
             data["header"] = {"X-BAPI-TIMESTAMP": str(int(time.time() * 1000))}
+
+    @staticmethod
+    def hyperliquid(ws: ClientWebSocketResponse, data: object) -> None:
+        url = ws._response.url
+        private_key: str = ws._response._session.__dict__["_apis"][
+            MessageSignHosts.items[url.host].name
+        ][0]
+
+        if not isinstance(data, dict):
+            return
+
+        method = data.get("method")
+        request = data.get("request")
+        if not (method == "post" and isinstance(request, dict)):
+            return
+
+        type_ = request.get("type")
+        payload = request.get("payload")
+        if not (type_ == "action" and isinstance(payload, dict)):
+            return
+
+        _Auth._hyperliquid(payload, url, private_key)
 
 
 class MessageSignHosts:
@@ -899,4 +966,8 @@ class MessageSignHosts:
         "stream.bybit.com": Item("bybit", MessageSign.bybit),
         "stream-demo.bybit.com": Item("bybit_demo", MessageSign.bybit),
         "stream-testnet.bybit.com": Item("bybit_testnet", MessageSign.bybit),
+        "api.hyperliquid.xyz": Item("hyperliquid", MessageSign.hyperliquid),
+        "api.hyperliquid-testnet.xyz": Item(
+            "hyperliquid_testnet", MessageSign.hyperliquid
+        ),
     }
